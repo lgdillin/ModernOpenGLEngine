@@ -260,6 +260,11 @@ RENDERING THEORY/PIPELINE
 		activated before use
 */
 
+/*
+VECTORS, MATRICES, AND UNIFORM VARIABLES
+	
+*/
+
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
