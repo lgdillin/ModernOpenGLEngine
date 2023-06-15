@@ -18,6 +18,9 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GlfwShaderService.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -29,6 +32,9 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="InterpolationIndexedDrawsProjections.md">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
