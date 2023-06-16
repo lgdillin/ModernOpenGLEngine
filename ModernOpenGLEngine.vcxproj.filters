@@ -18,15 +18,30 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="GlfwShaderService.hpp">
-      <Filter>Header Files</Filter>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Mesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicRenderPipeline.md">
+      <Filter>Resource Files</Filter>
+    </ClInclude>
     <ClInclude Include="GlfwWindow.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GlfwGame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -35,6 +50,12 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="InterpolationIndexedDrawsProjections.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="vertexShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragmentShader.frag">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

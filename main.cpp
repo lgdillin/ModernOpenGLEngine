@@ -273,13 +273,18 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 // Developed libraries
 #include "SdlWindow.hpp"
 #include "GlfwWindow.hpp"
+#include "GlfwGame.hpp"
 
 int main(int argc, char* argv[]) {
 	/*SdlWindow sdlWindow;
 	sdlWindow.create();*/
 
-	GlfwWindow glfwWindow;
-	glfwWindow.create();
+	//GlfwWindow glfwWindow;
+	//glfwWindow.createWindow();
+
+	GlfwGame glfwGame;
+	glfwGame.init(); 
+	glfwGame.runGame();
 
 
 	
