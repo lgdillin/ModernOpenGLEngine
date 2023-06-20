@@ -24,6 +24,18 @@
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GlfwCamera.hpp">
+      <Filter>Header Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangularPrism.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -44,6 +56,18 @@
     <ClInclude Include="GlfwGame.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GlfwWindow1.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RectangularPrism.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -56,6 +80,21 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="fragmentShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="CameraAndUserInput.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="TexturesAndImageLoading.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="PhongLightingAndDirectionalLights.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="fragmentShaderColor.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="MovingCamera.md">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

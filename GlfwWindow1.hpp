@@ -13,7 +13,7 @@ class GlfwWindow1 {
 public:
 	// Window dimensions
 	const GLint WIDTH = 800, HEIGHT = 600;
-	
+
 	// trick to ez compute degrees -> radians
 	const float toRadians = 3.14159265f / 180.0f;
 	GLFWwindow* window;
@@ -98,7 +98,7 @@ public:
 		// This is the spot where a lot of programmers like to indent
 		// to say 'we are now working with this VAO' and then when they are
 		// finished they unindent when they unbind the VAO
-		
+
 		// Now we need to create a buffer object to actually go inside that
 		glGenBuffers(1, &VBO);
 		// the VBO has multiple targets it can bind to
@@ -131,14 +131,14 @@ public:
 		//	the vertices, we might want to skip the rgb values in between and come back later
 		//	so in that case we would put a stride of 3, to 'stride' over those values as we read
 		// 6. offset - where the data starts, or where we want to pick back up
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 			6 * sizeof(GLfloat), (GLvoid*)0);
 
 		// Trying this again with the color interlaced
-		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 
+		glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
 			6 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
 		//glEnableVertexAttribArray(1);
-		
+
 		// we want to enable that location=0 we made in shader program
 		glEnableVertexAttribArray(0);
 		// Also enable the location=1 variable in the vertex shader
@@ -147,7 +147,7 @@ public:
 		// Unbinding the VBO
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		// Unbind the IBO/EBO
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0); 
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 		// Unbind the VAO
 		glBindVertexArray(0);
 
@@ -233,8 +233,8 @@ public:
 		glGetShaderiv(_shader, GL_COMPILE_STATUS, &result);
 		if (!result) {
 			glGetShaderInfoLog(shader, sizeof(errorLog), NULL, errorLog);
-			std::cout << "Error compiling shader type: " 
-				<< shaderType << " with error: " 
+			std::cout << "Error compiling shader type: "
+				<< shaderType << " with error: "
 				<< errorLog << std::endl;
 			return;
 		}
@@ -279,7 +279,7 @@ public:
 
 		// Get Buffer size information
 		int bufferWidth, bufferHeight;
-		
+
 		// Size of the main frame buffer we will be using
 		glfwGetFramebufferSize(
 			window, &bufferWidth, &bufferHeight);
@@ -357,7 +357,7 @@ public:
 
 			glm::mat4 model(1);
 			// Translation 
-			model = glm::translate(model, 
+			model = glm::translate(model,
 				glm::vec3(triangleOffset, 0.0f, -2.0f));
 			// Rotation
 			// model = glm::rotate(model, 15 * toRadians, glm::vec3(1.0f, 0.0f, 0.0f));
@@ -365,7 +365,7 @@ public:
 				glm::vec3(0.0f, 1.0f, 0.0f));
 			// Scaling
 			model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));
-			
+
 			sinArgument += 0.03f;
 			incrementArgument += 0.05f;
 			// 1. Use that uniform value ID that we obtain earlier in 
@@ -424,9 +424,9 @@ public:
 			// 
 			// glDrawArrays(GL_TRIANGLES, 0, 3);
 
-			
 
-			
+
+
 			// Using glDrawElements() over glDrawArrays()
 			// We don't need to specify the indices array as the last element,
 			// because we already bound it above
@@ -444,7 +444,7 @@ public:
 			// Is pointing to
 			glfwSwapBuffers(window);
 
-			
+
 		}
 
 		return 0;

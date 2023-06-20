@@ -133,21 +133,34 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="GlfwCamera.hpp" />
+    <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="RectangularPrism.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="Texture.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicRenderPipeline.md" />
     <ClInclude Include="GlfwGame.hpp" />
     <ClInclude Include="GlfwWindow.hpp" />
+    <ClInclude Include="GlfwWindow1.hpp" />
+    <ClInclude Include="Light.hpp" />
     <ClInclude Include="Mesh.hpp" />
+    <ClInclude Include="RectangularPrism.hpp" />
     <ClInclude Include="SdlWindow.hpp" />
     <ClInclude Include="Shader.hpp" />
+    <ClInclude Include="Texture.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="CameraAndUserInput.md" />
+    <None Include="fragmentShaderColor.frag" />
     <None Include="InterpolationIndexedDrawsProjections.md" />
     <None Include="fragmentShader.frag" />
+    <None Include="MovingCamera.md" />
+    <None Include="PhongLightingAndDirectionalLights.md" />
+    <None Include="TexturesAndImageLoading.md" />
     <None Include="vertexShader.vert" />
     <None Include="VectorsMatricesUniformVariables.md" />
   </ItemGroup>

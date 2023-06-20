@@ -16,6 +16,12 @@ public:
 
 	GLuint getModelLocation();
 	GLuint getProjectionLocation();
+	GLuint getViewLocation();
+	GLuint getAmbientIntensityLocation();
+	GLuint getAmbientColorLocation();
+	GLuint getScaleMatrixLocation();
+
+	GLuint getShaderId() { return shaderId; }
 
 	void useShader();
 	void clearShader();
@@ -36,6 +42,10 @@ private:
 	GLuint 
 		shaderId, 
 		uniformProjection, 
-		uniformModel;
+		uniformModel,
+		uniformView,
+		uniformScaleMatrix,
+		uniformAmbientIntensity,
+		uniformAmbientColor;
 
 };

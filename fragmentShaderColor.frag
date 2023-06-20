@@ -19,10 +19,10 @@ void main() {
 
 
 	// Color only mode
-	//color = vertexColor; 
+	color = vertexColor; 
 
 	// Texture-only mode
-	color = texture(texture0, texCoords);
+	//color = texture(texture0, texCoords);
 
 	// Texture and Color mod
 	//color = texture(texture0, texCoords) * ambientColor;

@@ -4,6 +4,7 @@ Shader::Shader() {
 	shaderId = 0;
 	uniformModel = 0;
 	uniformProjection = 0;
+	uniformView = 0;
 }
 
 Shader::~Shader() {
@@ -14,7 +15,8 @@ void Shader::createFromFile(std::string vFile, std::string fFile) {
 	std::ifstream fileStream(vFile, std::ios::in);
 
 	if (!fileStream.is_open()) {
-		throw ("File: " + vFile + " does not exist");
+		std::cout << "File: " << vFile << " does not exist" << std::endl;
+		throw;
 	}
 
 	// Read the vertex shader file
@@ -41,8 +43,6 @@ void Shader::createFromFile(std::string vFile, std::string fFile) {
 	}
 	fileStream.close();
 
-	std::cout << vFileContents << std::endl << fFileContents << std::endl;
-
 	compileShader(vFileContents, fFileContents);
 }
 
@@ -61,6 +61,22 @@ GLuint Shader::getProjectionLocation() {
 	return uniformProjection;
 }
 
+GLuint Shader::getViewLocation() {
+	return uniformView;
+}
+
+GLuint Shader::getAmbientIntensityLocation() {
+	return uniformAmbientIntensity;
+}
+
+GLuint Shader::getAmbientColorLocation() {
+	return uniformAmbientColor;
+}
+
+GLuint Shader::getScaleMatrixLocation() {
+	return uniformScaleMatrix;
+}
+
 void Shader::useShader() {
 	if (!shaderId) {
 		throw "No shader present to use";
@@ -76,6 +92,7 @@ void Shader::clearShader() {
 	shaderId = 0;
 	uniformModel = 0;
 	uniformProjection = 0;
+	uniformView = 0;
 }
 
 void Shader::compileShader(
@@ -130,6 +147,12 @@ void Shader::compileShader(
 	// We want the id of the location of the uniform variable in the program
 	uniformModel = glGetUniformLocation(shaderId, "model");
 	uniformProjection = glGetUniformLocation(shaderId, "projection");
+	uniformView = glGetUniformLocation(shaderId, "view");
+	uniformScaleMatrix = glGetUniformLocation(shaderId, "scaleMatrix");
+	uniformAmbientColor = glGetUniformLocation(shaderId, 
+		"directionalLight.color");
+	uniformAmbientIntensity = glGetUniformLocation(shaderId,
+		"directionalLight.ambientIntensity");
 	//uniformColor = glGetUniformLocation(shader, "newColor");
 }
 

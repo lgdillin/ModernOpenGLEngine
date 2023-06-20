@@ -264,6 +264,9 @@ RENDERING THEORY/PIPELINE
 VECTORS, MATRICES, AND UNIFORM VARIABLES
 	
 */
+//#define STBI_NO_SIMD
+#define STB_IMAGE_IMPLEMENTATION
+
 
 #include <iostream>
 #include <GL/glew.h>
@@ -274,6 +277,7 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 #include "SdlWindow.hpp"
 #include "GlfwWindow.hpp"
 #include "GlfwGame.hpp"
+#include "GlfwWindow1.hpp"
 
 int main(int argc, char* argv[]) {
 	/*SdlWindow sdlWindow;
@@ -286,6 +290,9 @@ int main(int argc, char* argv[]) {
 	glfwGame.init(); 
 	glfwGame.runGame();
 
+
+	//GlfwWindow1 glfw;
+	//glfw.create();
 
 	
 	return 0;
