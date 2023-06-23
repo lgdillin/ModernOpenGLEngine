@@ -5,13 +5,23 @@
 
 class Light {
 public:
-	Light();
-	Light(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntensity);
+	Light(
+		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f), 
+		GLfloat dIntensity = 0.2f,
+		GLfloat aIntensity = 1.0f);
+	
+	
 	~Light();
 
-	void useLight(GLuint ambientIntensityLocation,
-		GLuint ambientColorLocation);
-private:
+	virtual void useLight(
+		GLuint ambientIntensityLocation,
+		GLuint colorLocation,
+		GLfloat diffuseIntensityLocation,
+		GLfloat directionLocation) = 0;
+
+// protected means that these values can be accessed by subclasses,
+// but not anything else
+protected:
 	glm::vec3 color;
-	GLfloat ambientIntensity;
+	GLfloat ambientIntensity, diffuseIntensity;
 };

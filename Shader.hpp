@@ -18,8 +18,13 @@ public:
 	GLuint getProjectionLocation();
 	GLuint getViewLocation();
 	GLuint getAmbientIntensityLocation();
-	GLuint getAmbientColorLocation();
+	GLuint getColorLocation();
 	GLuint getScaleMatrixLocation();
+	GLuint getDiffuseIntensity();
+	GLuint getDirectionLocation();
+	GLuint getSpecularIntensityLocation();
+	GLuint getShininessLocation();
+	GLuint getEyePositionLocation();
 
 	GLuint getShaderId() { return shaderId; }
 
@@ -46,6 +51,11 @@ private:
 		uniformView,
 		uniformScaleMatrix,
 		uniformAmbientIntensity,
-		uniformAmbientColor;
+		uniformColor,
+		uniformDiffuseIntensity,
+		uniformDirection,
+		uniformEyePosition,
+		uniformSpecularIntensity,
+		uniformShininess;
 
 };

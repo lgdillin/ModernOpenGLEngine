@@ -36,6 +36,10 @@ public:
 
 	}
 
+	glm::vec3 getCameraPosition() {
+		return position;
+	}
+
 	glm::mat4 calculateViewMatrix() {
 		return glm::lookAt(position, position + front, up);
 	}

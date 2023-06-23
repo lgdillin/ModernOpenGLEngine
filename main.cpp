@@ -271,10 +271,10 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-#include <SDL.h>
+//#include <SDL.h>
 
 // Developed libraries
-#include "SdlWindow.hpp"
+//#include "SdlWindow.hpp"
 #include "GlfwWindow.hpp"
 #include "GlfwGame.hpp"
 #include "GlfwWindow1.hpp"

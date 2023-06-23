@@ -36,6 +36,9 @@
     <ClCompile Include="Light.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -68,6 +71,9 @@
     <ClInclude Include="RectangularPrism.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Material.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -97,5 +103,6 @@
     <None Include="MovingCamera.md">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="ScalingAndClippingTextures.md" />
   </ItemGroup>
 </Project>

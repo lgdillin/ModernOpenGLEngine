@@ -28,7 +28,6 @@ public:
 
 private:
 	GLfloat funVariable;
-
 	GLuint vertexArrayObject,
 		vertexBufferObject, 
 		indexBufferObject;

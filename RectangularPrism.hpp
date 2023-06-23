@@ -15,10 +15,25 @@
 // modified to fit 
 class RectangularPrism {
 public:
-	RectangularPrism();
-	RectangularPrism(Texture& _texture);
-	~RectangularPrism();
+	const unsigned int
+		vertexDataLength = (
+			4 // Number of vertices per face
+			* 6 // number of faces on a rectangular prism
+			* 11 // number of components per vertex
+		),
+		indicesDataLength = (
+			3 // indices per triangle
+			* 2 // Triangles per face
+			* 6 // faces per rectangular prism
+		),
+		numberOfVertexComponents = 11, // The number of components per vertex
+		offsetForVertexNormals = 8; // Where the vertex data begins per vertex
 
+	RectangularPrism();
+	~RectangularPrism();
+	void initialize(std::string pickColor = "white");
+
+	GLfloat get(size_t index) { return vertices[index]; }
 
 	void transform();
 	void update();
@@ -36,7 +51,10 @@ public:
 	void renderMesh() { mesh->renderMesh(); }
 
 	Texture* getTexture() { return texture; }
-	void setTexture(Texture &_texture) { texture = &_texture; }
+	void setTexture(Texture *_texture) { 
+		delete texture;
+		texture = _texture; 
+	}
 
 	void addTextureFromFile(std::string textureFileString);
 
@@ -55,8 +73,15 @@ public:
 	glm::mat4 getModelMatrix() { return model; }
 	glm::mat4 scaleTexture();
 
+	void printVertexData();
+	void printIndexData();
+
+	void buildVertexArray1();
 	void buildVertexArray();
+	void buildIndexArray1();
 	void buildIndexArray();
+
+	void computeInterpolatedNormalsSmoothEdges();
 
 	void pickColor(
 		std::string color = "custom",
@@ -65,6 +90,7 @@ public:
 	void swapColors(glm::vec3 color);
 
 private:
+	
 	GLfloat* vertices;
 	unsigned int* indices;
 

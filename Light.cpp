@@ -1,22 +1,27 @@
 #include "Light.hpp"
 
-Light::Light() {
-	color = glm::vec3(1.0f, 1.0f, 1.0f);
-	ambientIntensity = 1.0f;
-}
-
-Light::Light(GLfloat red, GLfloat green, GLfloat blue, GLfloat aIntensity) {
-	color = glm::vec3(red, green, blue);
+Light::Light(
+	glm::vec3 _color,
+	GLfloat aIntensity, 
+	GLfloat dIntensity
+) {
+	color = glm::vec3(_color.r, _color.g, _color.b);
 	ambientIntensity = aIntensity;
+
+	diffuseIntensity = dIntensity;
 }
 
 Light::~Light() {
 
 }
 
-void Light::useLight(GLuint ambientIntensityLocation,
-	GLuint ambientColorLocation) {
-
-	glUniform3f(ambientColorLocation, color.x, color.y, color.z);
-	glUniform1f(ambientIntensityLocation, ambientIntensity);
-}
+//void Light::useLight(GLuint ambientIntensityLocation, GLuint colorLocation,
+//	GLfloat diffuseIntensityLocation, GLfloat directionLocation
+//) {
+//
+//	glUniform3f(colorLocation, color.x, color.y, color.z);
+//	glUniform1f(ambientIntensityLocation, ambientIntensity);
+//	
+//	glUniform3f(directionLocation, direction.x, direction.y, direction.z);
+//	glUniform1f(diffuseIntensityLocation, diffuseIntensity);
+//}

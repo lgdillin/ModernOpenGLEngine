@@ -19,6 +19,7 @@
 #include "Texture.hpp"
 #include "RectangularPrism.hpp"
 #include "Light.hpp"
+#include "Material.hpp"
 
 class GlfwGame {
 private:
@@ -34,14 +35,21 @@ private:
 		uniformView,
 		uniformScaleMatrix,
 		uniformAmbientIntensity,
-		uniformAmbientColor;
+		uniformAmbientColor,
+		uniformDirection,
+		uniformDiffuseIntensity, 
+		uniformEyePosition,
+		uniformSpecularIntensity,
+		uniformShininess;
 
 	GLfloat deltaTime, lastTime;
 
-	GlfwWindow* glfwWindow;
+	GlfwWindow *glfwWindow;
 	GlfwCamera glfwCamera;
 
-	Texture dirtTexture, brickTexture, grassTexture;
+	Texture *dirtTexture, *brickTexture, *grassTexture, *boxTexture;
+	
+	Material shinyMaterial, dullMaterial;
 
 	Light simpleLight;
 
@@ -62,14 +70,27 @@ public:
 		
 	}
 
+	// Define a callback function
+	void DebugMessageCallback(GLenum source, GLenum type, GLuint id, 
+		GLenum severity, GLsizei length, const GLchar* message, 
+		const void* userParam
+	){
+		// Print the debug message to the console
+		std::cout << "OpenGL Debug Message: " << message << std::endl;
+	}
+
 	// Have some stuff to get the loop started
 	void init() {
+		glEnable(GL_DEBUG_OUTPUT);
+		//glDebugMessageCallback(DebugMessageCallback, nullptr);
 		// Initialize GLFW
+
 
 		glfwWindow = new GlfwWindow(800, 600);
 		glfwWindow->initialize();
 
 		glfwCamera = GlfwCamera();
+
 
 		GLfloat vertices[] = {
 			-1.0f, -1.0, 0.0f, // location
@@ -98,29 +119,40 @@ public:
 			0, 1, 2
 		};
 
-		simpleLight = Light(1.0f, 1.0f, 1.0f, 0.3f);
+		simpleLight = Light(
+			glm::vec3(5.0f, 5.25f, 1.0f),
+			glm::vec3(1.0f, 1.0f, 1.0f),
+			0.2f,
+			0.3f
+		);
 
-		brickTexture = Texture("resources/brick.png");
-		brickTexture.loadTexture();
-		dirtTexture = Texture("resources/dirt.png");
-		dirtTexture.loadTexture();
-		grassTexture = Texture("resources/grass.png");
-		grassTexture.loadTexture();
+		brickTexture = new Texture("resources/brick.png");
+		brickTexture->loadTexture();
+		dirtTexture = new Texture("resources/dirt.png");
+		dirtTexture->loadTexture();
+		grassTexture = new Texture("resources/grass.png");
+		grassTexture->loadTexture();
+		boxTexture = new Texture("resources/box.png");
+		boxTexture->loadTexture();
 
 		std::string vShader = "./vertexShader.vert";
 		std::string fShader = "./fragmentShader.frag";
 		std::string fShader1 = "./fragmentShaderColor.frag";
 
-		Shader* shader1 = new Shader();
+		Shader *shader1 = new Shader();
 		shader1->createFromFile(vShader, fShader);
 		shaders.push_back(shader1);
 
-		Shader* shader2 = new Shader();
+		Shader *shader2 = new Shader();
 		shader2->createFromFile(vShader, fShader1);
 		shaders.push_back(shader2);
 
+		shinyMaterial = Material(1.0f, 32);
+		dullMaterial = Material(0.3f, 4);
+
 
 		RectangularPrism* rp = new RectangularPrism();
+		rp->initialize();
 		rp->pickColor("custom", glm::vec3(0.0f, 0.5f, 0.0f));
 		rp->setTexture(grassTexture);
 		rp->setTranslationVector(glm::vec3(0.0f, 0.0f, 0.0f));
@@ -130,7 +162,9 @@ public:
 		prisms.push_back(rp);
 
 		// Initialize meshes
+		// ERROR HERE
 		RectangularPrism* rp1 = new RectangularPrism();
+		rp1->initialize();
 		rp1->pickColor("red");
 		rp1->setTexture(brickTexture);
 		rp1->setTranslationVector(glm::vec3(0.0f, 3.0f, 4.5f));
@@ -140,6 +174,7 @@ public:
 		prisms.push_back(rp1);
 
 		RectangularPrism* rp2 = new RectangularPrism();
+		rp2->initialize();
 		rp2->pickColor("blue");
 		rp2->setTexture(brickTexture);
 		rp2->setTranslationVector(glm::vec3(0.0f, 3.0f, -4.5f));
@@ -148,7 +183,8 @@ public:
 		rp2->setScalingVector(glm::vec3(10.0f, 5.0f, 1.0f));
 		prisms.push_back(rp2);
 
-		RectangularPrism* rp3 = new RectangularPrism(brickTexture);
+		RectangularPrism* rp3 = new RectangularPrism();
+		rp3->initialize();
 		rp3->pickColor("red");
 		rp3->setTexture(brickTexture);
 		rp3->setTranslationVector(glm::vec3(-4.5f, 3.0f, 0.0));
@@ -157,7 +193,8 @@ public:
 		rp3->setScalingVector(glm::vec3(8.0f, 5.0f, 1.0f));
 		prisms.push_back(rp3);
 
-		RectangularPrism* rp4 = new RectangularPrism(brickTexture);
+		RectangularPrism* rp4 = new RectangularPrism();
+		rp4->initialize();
 		rp4->pickColor("red");
 		rp4->setTexture(brickTexture);
 		rp4->setTranslationVector(glm::vec3(4.5f, 3.0f, 0.0f));
@@ -168,9 +205,10 @@ public:
 
 
 		// This one is the pyramid
-		RectangularPrism* rp5 = new RectangularPrism(dirtTexture);
+		RectangularPrism* rp5 = new RectangularPrism();
+		rp5->initialize();
 		rp5->pickColor("white");
-		rp5->setTexture(dirtTexture);
+		rp5->setTexture(boxTexture);
 		rp5->setTranslationVector(glm::vec3(0.0f, 3.0f, 0.0f));
 		rp5->setRotationAngle(0.0f);
 		rp5->setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
@@ -237,10 +275,16 @@ public:
 			uniformProjection = shaders[0]->getProjectionLocation();
 			uniformView = shaders[0]->getViewLocation();
 			uniformScaleMatrix = shaders[0]->getScaleMatrixLocation();
-			uniformAmbientColor = shaders[0]->getAmbientColorLocation();
+			uniformAmbientColor = shaders[0]->getColorLocation();
 			uniformAmbientIntensity = shaders[0]->getAmbientIntensityLocation();
+			uniformDiffuseIntensity = shaders[0]->getDiffuseIntensity();
+			uniformDirection = shaders[0]->getDirectionLocation();
+			uniformEyePosition = shaders[0]->getEyePositionLocation();
+			uniformSpecularIntensity = shaders[0]->getSpecularIntensityLocation();
+			uniformShininess = shaders[0]->getShininessLocation();
 
-			simpleLight.useLight(uniformAmbientIntensity, uniformAmbientColor);
+			simpleLight.useLight(uniformAmbientIntensity, uniformAmbientColor, 
+				uniformDiffuseIntensity, uniformDirection);
 
 			sinArgument += 0.03f;
 			incrementArgument += 0.05f;
@@ -248,21 +292,29 @@ public:
 
 
 			// render/update loop
+			glUniform3f(uniformEyePosition,
+				glfwCamera.getCameraPosition().x,
+				glfwCamera.getCameraPosition().y,
+				glfwCamera.getCameraPosition().z);
 			glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
 				glm::value_ptr(glfwWindow->getProjection()));
 			glUniformMatrix4fv(uniformView, 1, GL_FALSE,
 				glm::value_ptr(glfwCamera.calculateViewMatrix()));
 			int i = 0;
 			for (RectangularPrism* prism : prisms) {
-				if (i == 5) {
+				if (i == 20) {
 					shaders[1]->useShader();
 					uniformModel = shaders[1]->getModelLocation();
 					uniformProjection = shaders[1]->getProjectionLocation();
 					uniformView = shaders[1]->getViewLocation();
 					uniformScaleMatrix = shaders[1]->getScaleMatrixLocation();
-					uniformAmbientColor = shaders[1]->getAmbientColorLocation();
+					uniformAmbientColor = shaders[1]->getColorLocation();
 					uniformAmbientIntensity = shaders[1]->getAmbientIntensityLocation();
-					simpleLight.useLight(uniformAmbientIntensity, uniformAmbientColor);
+					uniformDiffuseIntensity = shaders[1]->getDiffuseIntensity();
+					uniformDirection = shaders[1]->getDirectionLocation();
+					std::cout << "this should not execute";
+					simpleLight.useLight(uniformAmbientIntensity, uniformAmbientColor,
+						uniformDiffuseIntensity, uniformDirection);
 					glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
 						glm::value_ptr(glfwWindow->getProjection()));
 					glUniformMatrix4fv(uniformView, 1, GL_FALSE,
@@ -280,8 +332,17 @@ public:
 				glUniformMatrix4fv(uniformScaleMatrix, 1, GL_FALSE,
 					glm::value_ptr(prism->scaleTexture()));
 
+				//prism->printVertexData();
+
 				prism->getTexture()->useTexture();
+				if (i == 5) {
+					shinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+				} else {
+					dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+				}
 				prism->renderMesh();
+
+				//prism->printVertexData();
 
 				++i;
 			}

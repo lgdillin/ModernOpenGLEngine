@@ -130,6 +130,7 @@ public:
 			glfwTerminate();
 			return 1;
 		}
+		glewExperimental = GL_TRUE;
 
 		// Setup GLFW window properties
 		// OpenGL version
