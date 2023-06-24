@@ -1,10 +1,16 @@
 #pragma once
 
 #include <iostream>
+#include <format>
 #include <string>
 #include <fstream>
 
 #include <GL/glew.h>
+
+#include "PointLight.hpp"
+#include "DirectionalLight.hpp"
+
+#define MAX_POINT_LIGHTS 3
 
 class Shader {
 public:
@@ -28,10 +34,33 @@ public:
 
 	GLuint getShaderId() { return shaderId; }
 
+	void setDirectionalLight(DirectionalLight *dLight);
+	void setPointLights(PointLight *pointLight, unsigned int lightCount);
+
 	void useShader();
 	void clearShader();
 
 private:
+
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+
+		GLuint uniformDirection;
+	} uniformDirectionalLight;
+
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+
+		GLuint uniformPosition;
+		GLuint uniformConstant;
+		GLuint uniformLinear;
+		GLuint uniformQuadratic;
+	} uniformPointLight[MAX_POINT_LIGHTS];
+
 	// compiles a shader from a string literal or from a read file
 	void compileShader(
 		std::string vertexCode, 
@@ -44,18 +73,21 @@ private:
 		GLenum shaderType
 	);
 
+	int pointLightCount;
+
 	GLuint 
 		shaderId, 
 		uniformProjection, 
 		uniformModel,
 		uniformView,
 		uniformScaleMatrix,
-		uniformAmbientIntensity,
-		uniformColor,
-		uniformDiffuseIntensity,
-		uniformDirection,
+		//uniformAmbientIntensity,
+		//uniformColor,
+		//uniformDiffuseIntensity,
+		//uniformDirection,
 		uniformEyePosition,
 		uniformSpecularIntensity,
-		uniformShininess;
+		uniformShininess,
+		uniformPointLightCount;
 
 };

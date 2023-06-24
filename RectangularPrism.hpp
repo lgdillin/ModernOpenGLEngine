@@ -81,6 +81,9 @@ public:
 	void buildIndexArray1();
 	void buildIndexArray();
 
+	void buildBoundingBox();
+	GLfloat *getBoundingBox() { return boundingBox; }
+
 	void computeInterpolatedNormalsSmoothEdges();
 
 	void pickColor(
@@ -90,7 +93,7 @@ public:
 	void swapColors(glm::vec3 color);
 
 private:
-	
+	GLfloat boundingBox[24];
 	GLfloat* vertices;
 	unsigned int* indices;
 

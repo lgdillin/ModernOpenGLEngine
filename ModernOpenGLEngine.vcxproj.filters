@@ -39,6 +39,12 @@
     <ClCompile Include="Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -74,6 +80,15 @@
     <ClInclude Include="Material.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="DirectionalLight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraBall.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -103,6 +118,11 @@
     <None Include="MovingCamera.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="ScalingAndClippingTextures.md" />
+    <None Include="PointLightAndSpotLights.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ScalingAndClippingTextures.md">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

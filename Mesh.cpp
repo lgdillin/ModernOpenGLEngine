@@ -31,7 +31,9 @@ void Mesh::createMesh(
 
 	// Sometimes the VAO doesn't generate?
 	GLenum error = glGetError();
-	if (error != GL_NO_ERROR) std::cout << error << std::endl;
+	if (error != GL_NO_ERROR) {
+		std::cout << "Error in createMesh() " << error << std::endl;
+	}
 
 
 	// Request a VAO id (an alloc memory) from the GPU and 

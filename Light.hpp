@@ -6,18 +6,22 @@
 class Light {
 public:
 	Light(
-		glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f), 
+		glm::vec3 _color = glm::vec3(1.0f, 1.0f, 1.0f), 
 		GLfloat dIntensity = 0.2f,
 		GLfloat aIntensity = 1.0f);
 	
 	
 	~Light();
 
-	virtual void useLight(
-		GLuint ambientIntensityLocation,
-		GLuint colorLocation,
-		GLfloat diffuseIntensityLocation,
-		GLfloat directionLocation) = 0;
+	//void useLight(
+	//	GLuint ambientIntensityLocation,
+	//	GLuint colorLocation,
+	//	GLfloat diffuseIntensityLocation,
+	//	GLfloat directionLocation,
+	//	GLfloat constantLocation = 0.0f,
+	//	GLfloat linearLocation = 0.0f,
+	//	GLfloat quadraticLocation = 0.0f
+	//);
 
 // protected means that these values can be accessed by subclasses,
 // but not anything else

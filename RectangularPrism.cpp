@@ -206,6 +206,69 @@ void RectangularPrism::printIndexData() {
 	}
 }
 
+void RectangularPrism::buildBoundingBox() {
+
+	GLfloat xMin = vertices[0];
+	GLfloat xMax = vertices[0];
+
+	GLfloat yMin = vertices[1];
+	GLfloat yMax = vertices[1];
+
+	GLfloat zMin = vertices[2];
+	GLfloat zMax = vertices[2];
+	for (int i = 0; i < vertexDataLength / numberOfVertexComponents; ++i) {
+		if (vertices[i] < xMin) xMin = vertices[i];
+		if (vertices[i] > xMax) xMax = vertices[i];
+
+		if (vertices[i + 1] < yMin) yMin = vertices[i + 1];
+		if (vertices[i + 1] > yMax) yMax = vertices[i + 1];
+
+		if (vertices[i + 2] < zMin) zMin = vertices[i + 2];
+		if (vertices[i + 2] > zMax) zMax = vertices[i + 2];
+	}
+
+	// vertices are defined front to back, CCW starting bottom left
+	// vertex 0:
+	boundingBox[0] = xMin;
+	boundingBox[1] = yMin;
+	boundingBox[2] = zMax;
+
+	// vertex 1;:
+	boundingBox[3] = xMax;
+	boundingBox[4] = yMin;
+	boundingBox[5] = zMax;
+
+	//vertex 2
+	boundingBox[6] = xMax;
+	boundingBox[7] = yMax;
+	boundingBox[8] = zMax;
+
+	// vertex 3
+	boundingBox[9] = xMin;
+	boundingBox[10] = yMax;
+	boundingBox[11] = zMax;
+
+	// vertex 4
+	boundingBox[12] = xMin;
+	boundingBox[13] = yMin;
+	boundingBox[14] = zMin;
+
+	// vertex 5
+	boundingBox[15] = xMax;
+	boundingBox[16] = yMin;
+	boundingBox[17] = zMin;
+
+	// vertex 6
+	boundingBox[18] = xMax;
+	boundingBox[19] = yMax;
+	boundingBox[20] = zMin;
+
+	// vertex 7
+	boundingBox[21] = xMin;
+	boundingBox[22] = yMax;
+	boundingBox[23] = zMin;
+}
+
 void RectangularPrism::buildVertexArray1() {
 	vertices = new GLfloat[vertexDataLength]{
 		// Front face

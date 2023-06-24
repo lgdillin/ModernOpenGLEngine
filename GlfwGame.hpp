@@ -18,7 +18,8 @@
 #include "GlfwCamera.hpp"
 #include "Texture.hpp"
 #include "RectangularPrism.hpp"
-#include "Light.hpp"
+#include "DirectionalLight.hpp"
+#include "PointLight.hpp"
 #include "Material.hpp"
 
 class GlfwGame {
@@ -47,11 +48,17 @@ private:
 	GlfwWindow *glfwWindow;
 	GlfwCamera glfwCamera;
 
-	Texture *dirtTexture, *brickTexture, *grassTexture, *boxTexture;
+	Texture *dirtTexture, *brickTexture, *grassTexture, *boxTexture,
+		*rustTexture, *plainTexture;
 	
 	Material shinyMaterial, dullMaterial;
 
-	Light simpleLight;
+	DirectionalLight directionalLight;
+	PointLight pointLights[MAX_POINT_LIGHTS];
+
+	unsigned int pointLightCount;
+
+	GLenum error;
 
 public:
 	GlfwGame() {
@@ -119,12 +126,26 @@ public:
 			0, 1, 2
 		};
 
-		simpleLight = Light(
-			glm::vec3(5.0f, 5.25f, 1.0f),
+		directionalLight = DirectionalLight(
+			glm::vec3(1.0f, 3.0f, 1.0f),
 			glm::vec3(1.0f, 1.0f, 1.0f),
 			0.2f,
 			0.3f
 		);
+
+		pointLights[0] = PointLight(
+			glm::vec3(8.0f, 0.5f, -0.5f),
+			glm::vec3(1.0f, 1.0f, 0.0f)
+		);
+		pointLights[1] = PointLight(
+			glm::vec3(2.0f, 2.0f, 5.0f),
+			glm::vec3(0.5f, 1.0f, 0.0f)
+		);
+		pointLights[2] = PointLight(
+			glm::vec3(10.0f, 6.0f, 22.5f),
+			glm::vec3(1.0f, 0.5f, 0.0f)
+		);
+		//pointLightCount = 3;
 
 		brickTexture = new Texture("resources/brick.png");
 		brickTexture->loadTexture();
@@ -134,6 +155,10 @@ public:
 		grassTexture->loadTexture();
 		boxTexture = new Texture("resources/box.png");
 		boxTexture->loadTexture();
+		rustTexture = new Texture("resources/rusty.png");
+		rustTexture->loadTexture();
+		plainTexture = new Texture("resources/plain.png");
+		plainTexture->loadTexture();
 
 		std::string vShader = "./vertexShader.vert";
 		std::string fShader = "./fragmentShader.frag";
@@ -150,71 +175,230 @@ public:
 		shinyMaterial = Material(1.0f, 32);
 		dullMaterial = Material(0.3f, 4);
 
+		// floor1
+		addNewBrush(
+			"green",
+			grassTexture,
+			glm::vec3(0.0f, 0.0f, 0.0f),
+			90.0f,
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(10.0f, 10.0f, 1.0f));
 
-		RectangularPrism* rp = new RectangularPrism();
+		// floor 2
+		addNewBrush(
+			"green",
+			grassTexture,
+			glm::vec3(10.0f, 0.0f, 0.0f),
+			90.0f,
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(10.0f, 10.0f, 1.0f));
+
+		// floor 3
+		addNewBrush(
+			"green",
+			grassTexture,
+			glm::vec3(10.0f, 0.0f, 10.0f),
+			90.0f,
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(10.0f, 10.0f, 1.0f));
+
+		// floor 4
+		addNewBrush(
+			"green",
+			dirtTexture,
+			glm::vec3(10.0f, 0.0f, 22.5f),
+			90.0f,
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(15.0f, 15.0f, 1.0f));
+
+		// house ceiling
+		addNewBrush(
+			"green",
+			rustTexture,
+			glm::vec3(10.0f, 9.0f, 22.5f),
+			90.0f,
+			glm::vec3(1.0f, 0.0f, 0.0f),
+			glm::vec3(15.0f, 15.0f, 1.0f));
+
+		// short right wall room 1
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(2.5f, 3.0f, 4.5f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(15.0f, 5.0f, 1.0f)
+		);
+
+		// long left wall room 1
+		addNewBrush(
+			"blue",
+			brickTexture,
+			glm::vec3(5.0f, 3.0f, -4.5f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(20.0f, 5.0f, 1.0f)
+		);
+
+		// back wall room 1
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(-4.5f, 3.0f, 0.0),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(8.0f, 5.0f, 1.0f)
+		);
+
+		// far wall room 2
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(14.5f, 3.0f, 0.5f),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(9.0f, 5.0f, 1.0f)
+		);
+
+		// right wall room 3
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(5.5f, 3.0f, 10.0f),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(10.0f, 5.0f, 1.0f)
+		);
+
+		// left wall room 3
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(14.5f, 3.0f, 10.0f),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(10.0f, 5.0f, 1.0f)
+		);
+
+		// door partition
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(4.5f, 3.0f, 3.25f),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(1.5f, 5.0f, 1.0f)
+		);
+
+		// door partition
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(4.5f, 3.0f, -3.25f),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(1.5f, 5.0f, 1.0f)
+		);
+
+		// house left door partition
+		addNewBrush(
+			"blue",
+			brickTexture,
+			glm::vec3(15.0f, 3.0f, 15.5f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(5.0f, 5.0f, 1.0f)
+		);
+
+		// house right door partition
+		addNewBrush(
+			"blue",
+			brickTexture,
+			glm::vec3(5.0f, 3.0f, 15.5f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(5.0f, 5.0f, 1.0f)
+		);
+
+		// house door header
+		addNewBrush(
+			"blue",
+			brickTexture,
+			glm::vec3(10.0f, 7.0f, 15.5f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(15.0f, 3.0f, 1.0f)
+		);
+
+		// house back wall
+		addNewBrush(
+			"blue",
+			brickTexture,
+			glm::vec3(10.0f, 4.5f, 29.5f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(15.0f, 8.0f, 1.0f)
+		);
+
+		// house left wall
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(17.0f, 4.5f, 22.5f),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(13.0f, 8.0f, 1.0f)
+		);
+
+		// house right wall
+		addNewBrush(
+			"red",
+			brickTexture,
+			glm::vec3(3.0f, 4.5f, 22.5f),
+			90.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(13.0f, 8.0f, 1.0f)
+		);
+
+		addNewBrush(
+			"white",
+			boxTexture,
+			glm::vec3(0.0f, 3.0f, 0.0f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(1.0f, 1.0f, 1.0f)
+		);
+
+
+
+		addNewBrush(
+			"white",
+			plainTexture,
+			glm::vec3(10.0f, 3.0f, 22.5f),
+			0.0f,
+			glm::vec3(0.0f, 1.0f, 0.0f),
+			glm::vec3(2.0f, 2.0f, 2.0f)
+		);
+
+	}
+
+	void addNewBrush(
+		std::string color,
+		Texture* texture,
+		glm::vec3 translation,
+		float rotationAngle,
+		glm::vec3 rotVector,
+		glm::vec3 scale
+	) {
+		RectangularPrism *rp = new RectangularPrism();
 		rp->initialize();
-		rp->pickColor("custom", glm::vec3(0.0f, 0.5f, 0.0f));
-		rp->setTexture(grassTexture);
-		rp->setTranslationVector(glm::vec3(0.0f, 0.0f, 0.0f));
-		rp->setRotationAngle(glm::radians(90.0f));
-		rp->setRotationVector(glm::vec3(1.0f, 0.0f, 0.0f));
-		rp->setScalingVector(glm::vec3(10.0f, 10.0f, 1.0f));
+		rp->pickColor(color);
+		rp->setTexture(texture);
+		rp->setTranslationVector(translation);
+		rp->setRotationAngle(glm::radians(rotationAngle));
+		rp->setRotationVector(rotVector);
+		rp->setScalingVector(scale);
 		prisms.push_back(rp);
-
-		// Initialize meshes
-		// ERROR HERE
-		RectangularPrism* rp1 = new RectangularPrism();
-		rp1->initialize();
-		rp1->pickColor("red");
-		rp1->setTexture(brickTexture);
-		rp1->setTranslationVector(glm::vec3(0.0f, 3.0f, 4.5f));
-		rp1->setRotationAngle(0.0f);
-		rp1->setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
-		rp1->setScalingVector(glm::vec3(10.0f, 5.0f, 1.0f));
-		prisms.push_back(rp1);
-
-		RectangularPrism* rp2 = new RectangularPrism();
-		rp2->initialize();
-		rp2->pickColor("blue");
-		rp2->setTexture(brickTexture);
-		rp2->setTranslationVector(glm::vec3(0.0f, 3.0f, -4.5f));
-		rp2->setRotationAngle(0.0f);
-		rp2->setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
-		rp2->setScalingVector(glm::vec3(10.0f, 5.0f, 1.0f));
-		prisms.push_back(rp2);
-
-		RectangularPrism* rp3 = new RectangularPrism();
-		rp3->initialize();
-		rp3->pickColor("red");
-		rp3->setTexture(brickTexture);
-		rp3->setTranslationVector(glm::vec3(-4.5f, 3.0f, 0.0));
-		rp3->setRotationAngle(glm::radians(90.0f));
-		rp3->setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
-		rp3->setScalingVector(glm::vec3(8.0f, 5.0f, 1.0f));
-		prisms.push_back(rp3);
-
-		RectangularPrism* rp4 = new RectangularPrism();
-		rp4->initialize();
-		rp4->pickColor("red");
-		rp4->setTexture(brickTexture);
-		rp4->setTranslationVector(glm::vec3(4.5f, 3.0f, 0.0f));
-		rp4->setRotationAngle(glm::radians(90.0f));
-		rp4->setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
-		rp4->setScalingVector(glm::vec3(8.0f, 5.0f, 1.0f));
-		prisms.push_back(rp4);
-
-
-		// This one is the pyramid
-		RectangularPrism* rp5 = new RectangularPrism();
-		rp5->initialize();
-		rp5->pickColor("white");
-		rp5->setTexture(boxTexture);
-		rp5->setTranslationVector(glm::vec3(0.0f, 3.0f, 0.0f));
-		rp5->setRotationAngle(0.0f);
-		rp5->setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
-		rp5->setScalingVector(glm::vec3(1.0f, 1.0f, 1.0f));
-		prisms.push_back(rp5);
-
 	}
 
 
@@ -275,16 +459,21 @@ public:
 			uniformProjection = shaders[0]->getProjectionLocation();
 			uniformView = shaders[0]->getViewLocation();
 			uniformScaleMatrix = shaders[0]->getScaleMatrixLocation();
-			uniformAmbientColor = shaders[0]->getColorLocation();
-			uniformAmbientIntensity = shaders[0]->getAmbientIntensityLocation();
-			uniformDiffuseIntensity = shaders[0]->getDiffuseIntensity();
-			uniformDirection = shaders[0]->getDirectionLocation();
+			//uniformAmbientColor = shaders[0]->getColorLocation();
+			//uniformAmbientIntensity = shaders[0]->getAmbientIntensityLocation();
+			//uniformDiffuseIntensity = shaders[0]->getDiffuseIntensity();
+			//uniformDirection = shaders[0]->getDirectionLocation();
 			uniformEyePosition = shaders[0]->getEyePositionLocation();
 			uniformSpecularIntensity = shaders[0]->getSpecularIntensityLocation();
 			uniformShininess = shaders[0]->getShininessLocation();
 
-			simpleLight.useLight(uniformAmbientIntensity, uniformAmbientColor, 
-				uniformDiffuseIntensity, uniformDirection);
+			//directionalLight.useLight(uniformAmbientIntensity, uniformAmbientColor, 
+			//	uniformDiffuseIntensity, uniformDirection);
+			//error = glGetError(); std::cout << error;
+			shaders[0]->setDirectionalLight(&directionalLight);
+			//error = glGetError(); std::cout << error;
+			shaders[0]->setPointLights(pointLights, 3);
+			//error = glGetError(); std::cout << error;
 
 			sinArgument += 0.03f;
 			incrementArgument += 0.05f;
@@ -302,19 +491,19 @@ public:
 				glm::value_ptr(glfwCamera.calculateViewMatrix()));
 			int i = 0;
 			for (RectangularPrism* prism : prisms) {
-				if (i == 20) {
+				if (i == 90) {
 					shaders[1]->useShader();
 					uniformModel = shaders[1]->getModelLocation();
 					uniformProjection = shaders[1]->getProjectionLocation();
 					uniformView = shaders[1]->getViewLocation();
 					uniformScaleMatrix = shaders[1]->getScaleMatrixLocation();
-					uniformAmbientColor = shaders[1]->getColorLocation();
-					uniformAmbientIntensity = shaders[1]->getAmbientIntensityLocation();
-					uniformDiffuseIntensity = shaders[1]->getDiffuseIntensity();
-					uniformDirection = shaders[1]->getDirectionLocation();
+					//uniformAmbientColor = shaders[1]->getColorLocation();
+					//uniformAmbientIntensity = shaders[1]->getAmbientIntensityLocation();
+					//uniformDiffuseIntensity = shaders[1]->getDiffuseIntensity();
+					//uniformDirection = shaders[1]->getDirectionLocation();
 					std::cout << "this should not execute";
-					simpleLight.useLight(uniformAmbientIntensity, uniformAmbientColor,
-						uniformDiffuseIntensity, uniformDirection);
+					//directionalLight.useLight(uniformAmbientIntensity, uniformAmbientColor,
+					//	uniformDiffuseIntensity, uniformDirection);
 					glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
 						glm::value_ptr(glfwWindow->getProjection()));
 					glUniformMatrix4fv(uniformView, 1, GL_FALSE,
@@ -335,10 +524,13 @@ public:
 				//prism->printVertexData();
 
 				prism->getTexture()->useTexture();
-				if (i == 5) {
+				//error = glGetError(); std::cout << error;
+
+				if (i == 20) {
 					shinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 				} else {
 					dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+					//shinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 				}
 				prism->renderMesh();
 
