@@ -22,6 +22,7 @@
 #include "PointLight.hpp"
 #include "Material.hpp"
 #include "CameraBall.hpp"
+#include "MeshCollider.hpp"
 
 class GlfwGame {
 private:
@@ -61,6 +62,8 @@ private:
 	unsigned int pointLightCount;
 
 	GLenum error;
+
+	MeshCollider MeshCollider;
 
 public:
 	GlfwGame() {

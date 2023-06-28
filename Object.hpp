@@ -11,3 +11,5 @@ struct Object {
 	glm::vec3 force;
 	float mass;
 };
+
+struct 

@@ -2,6 +2,8 @@
 
 #include <iostream>
 
+#include <glm/glm.hpp>
+
 class Entity {
 public:
 	Entity();
@@ -10,7 +12,7 @@ public:
 	Entity(Entity &e);
 	virtual ~Entity();
 
-	virtual void update() = 0;
+	virtual void updatePosition() = 0;
 
 	virtual void render(float dt) = 0;
 

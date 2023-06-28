@@ -13,6 +13,16 @@ public:
 		glfwCamera = _glfwCamera;
 	}
 
+	~Player() {}
+
+	void updatePosition() {
+
+	}
+
+	void render() {}
+
+	void control() {} // nothing yet.
+
 private:
 	GlfwCamera *glfwCamera; // allows the model (player) to send information to the view
 };

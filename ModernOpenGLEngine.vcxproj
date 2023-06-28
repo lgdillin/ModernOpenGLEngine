@@ -148,8 +148,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicRenderPipeline.md" />
+    <ClInclude Include="Camera.hpp" />
     <ClInclude Include="CameraBall.hpp" />
     <ClInclude Include="DirectionalLight.hpp" />
+    <ClInclude Include="Entity.hpp" />
     <ClInclude Include="GlfwGame.hpp" />
     <ClInclude Include="GlfwWindow.hpp" />
     <ClInclude Include="GlfwWindow1.hpp" />
@@ -158,6 +160,9 @@
     <ClInclude Include="Material.hpp" />
     <ClInclude Include="Mesh.hpp" />
     <ClInclude Include="MeshCollider.hpp" />
+    <ClInclude Include="Object.hpp" />
+    <ClInclude Include="PhysicsModel.hpp" />
+    <ClInclude Include="Player.hpp" />
     <ClInclude Include="PointLight.hpp" />
     <ClInclude Include="RectangularPrism.hpp" />
     <ClInclude Include="SdlWindow.hpp" />

@@ -123,10 +123,12 @@ public:
 		}
 
 	
+
 		// Once a supporting point isn't found further from the closest face,
 		// we'll return that face's normal and its distance
+		ManifoldPoints points;
 		points.normal = glm::vec3(0.0f);
-		points.penetrationDepth = minDistance + 0.001f;
+		//points.penetrationDepth = minDistance + 0.001f;
 		points.hasCollision = true;
 		return points;
 	}
@@ -261,7 +263,7 @@ public:
 	// so we need to find the direction to the origin from the closest feature.
 	// if we find that the closest feature is already the closest possible,
 	// but the origin is not contained, we know there is no collision.
-	bool Gjk(RectangularPrism *rp1, RectangularPrism *rp2) {
+	bool gjk(RectangularPrism *rp1, RectangularPrism *rp2) {
 		// The goal of the GJK algorith is to determine if the origin
 		// lies within the minkowski difference
 
