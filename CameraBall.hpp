@@ -4,28 +4,51 @@
 
 #include "GlfwCamera.hpp"
 
+#define APPLY_GRAVITY true
+
 class CameraBall {
-	CameraBall() {
-		radius = 0.5f;
-	}
+public:
+	CameraBall() {}
 
 	CameraBall(GlfwCamera* _glfwCamera) {
 		glfwCamera = _glfwCamera;
-		radius = 0.5f;
+		width = 0.2f;
+		eyeHeight = 2.0f;
+		bodyHeight = 0.05f;
+		toggleGravity = APPLY_GRAVITY;
+
+		glfwCamera->setToggleGravity(toggleGravity);
 	}
 
-	bool collision() {
-		GLfloat xPos = glfwCamera->getCameraPosition().x;
-		GLfloat yPos = glfwCamera->getCameraPosition().y;
-		GLfloat zPos = glfwCamera->getCameraPosition().z;
-
-		return false;
+	void applyGravity() {
+		if (glfwCamera->getToggleGravity()) {
+			glfwCamera->bumpCamera(glm::vec3(0.0f, -0.01f, 0.0f));
+		}
 	}
+
+	bool getToggleGravity() { return toggleGravity; }
+
+	void setToggleGravity(bool g) {
+		toggleGravity = g;
+	}
+
+	void jump() {
+
+	}
+
+	GlfwCamera *getCamera() { return glfwCamera; }
+
+	GLfloat getWidth() { return width; }
+	GLfloat getEyeHeight() { return eyeHeight; }
+	GLfloat getBodyHeight() { return bodyHeight; }
 
 	~CameraBall() {}
 
 private:
+	bool toggleGravity;
 	GlfwCamera *glfwCamera;
 
-	GLfloat radius;
+	GLfloat width;
+	GLfloat eyeHeight;
+	GLfloat bodyHeight;
 };

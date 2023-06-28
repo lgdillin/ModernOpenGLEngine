@@ -32,6 +32,7 @@ private:
 	GLFWwindow* window;
 
 	bool keys[1024]; // covers range of ASCII characters for keypresses
+	bool keyHit[1024]; // adds an extra binary value for toggle-able keys
 
 	static void keyHandlerCallback(
 		GLFWwindow* window,
@@ -91,6 +92,7 @@ public:
 		// fill the array of bools
 		for (size_t i = 0; i < 1024; ++i) {
 			keys[i] = false;
+			keyHit[i] = false;
 		}
 	}
 
@@ -107,7 +109,8 @@ public:
 
 	void swapBuffers() { glfwSwapBuffers(window); }
 
-	bool* getKeys() { return keys; }
+	bool *getKeys() { return keys; }
+	bool *getKeyHit() { return keyHit; }
 
 	GLfloat getMouseDeltaX() {
 		GLfloat deltaX = mouseDeltaX;
@@ -167,6 +170,7 @@ public:
 		glfwSetKeyCallback(window, keyHandlerCallback);
 		glfwSetCursorPosCallback(window, mouseHandlerCallback);
 		// Lock the cursor in the center of the screen and hide it
+		glfwSetInputMode(window, GLFW_STICKY_KEYS, GLFW_TRUE);
 		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 		// Set the Context for GLEW to use

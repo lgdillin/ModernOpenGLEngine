@@ -11,7 +11,7 @@ public:
 
 
 	GlfwCamera(
-		glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f),
+		glm::vec3 _position = glm::vec3(8.0f, 15.0f, 0.0f),
 		glm::vec3 _up = glm::vec3(0.0f, 1.0f, 0.0f),
 		GLfloat _yaw = -90.0f,
 		GLfloat _pitch = 0.0f,
@@ -27,7 +27,8 @@ public:
 
 		front = glm::vec3(0.0f, 0.0f, -1.0f);
 
-		position = glm::vec3(0.0f, 3.0f, 2.0f);
+		//position = glm::vec3(0.0f, 3.0f, 2.0f);
+		lastPosition = position;
 
 		update();
 	}
@@ -44,7 +45,43 @@ public:
 		return glm::lookAt(position, position + front, up);
 	}
 
-	void keyControl(bool* keys, GLfloat deltaTime) {
+	void setLastPosition(glm::vec3 last) {
+		lastPosition = last;
+	}
+
+	void setXPosition(GLfloat x) {
+		position.x = x;
+	}
+
+	void setYPosition(GLfloat y) {
+		position.y = y;
+	}
+
+	void setZPosition(GLfloat z) {
+		position.z = z;
+	}
+
+	glm::vec3 getLastPosition() {
+		return lastPosition;
+	}
+
+	void setCurrentPosition(glm::vec3 current) {
+		position = current;
+	}
+
+	void setToggleGravity(bool g) {
+		toggleGravity = g;
+	}
+
+	bool getToggleGravity() { return toggleGravity; }
+
+	void bumpCamera(glm::vec3 bump) {
+		// Moves the camera by a small amount (collision detection
+		lastPosition = position;
+		position += bump;
+	}
+
+	void keyControl(bool* keys, bool* keyHit, GLfloat deltaTime) {
 		GLfloat velocity = movementSpeed * deltaTime;
 
 		if (keys[GLFW_KEY_W]) {
@@ -57,6 +94,20 @@ public:
 			position += right * velocity;
 		} else if (keys[GLFW_KEY_A]) {
 			position -= right * velocity;
+		}
+
+		if (keys[GLFW_KEY_G]) {
+			if (keyHit[GLFW_KEY_G] == false) {
+				keyHit[GLFW_KEY_G] = true;
+				setToggleGravity(!toggleGravity);
+			}
+		} else {
+			keyHit[GLFW_KEY_G] = false;
+		}
+
+
+		if (keys[GLFW_KEY_SPACE]) {
+			bumpCamera(glm::vec3(0.0f, 5.0f, 0.0f) * velocity);
 		}
 	}
 
@@ -87,12 +138,16 @@ private:
 	glm::vec3 worldUp; // true global y-axis
 	glm::vec3 right;
 
+	glm::vec3 lastPosition;
+
 	GLfloat yaw; // look left/right
 	GLfloat pitch; // look up/down
 	GLfloat roll; // tilt head to the side
 
 	GLfloat movementSpeed;
 	GLfloat turnSpeed;
+
+	bool toggleGravity;
 
 	void update() {
 		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

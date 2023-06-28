@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iostream>
+#include <array>
 
 #include <GL/glew.h>
 
@@ -15,7 +16,7 @@
 // modified to fit 
 class RectangularPrism {
 public:
-	const unsigned int
+	static const unsigned int
 		vertexDataLength = (
 			4 // Number of vertices per face
 			* 6 // number of faces on a rectangular prism
@@ -38,8 +39,8 @@ public:
 	void transform();
 	void update();
 
-	GLfloat* getVertexArrayPointer() { return vertices; }
-	unsigned int* getIndexArrayPointer() { return indices; }
+	std::array<GLfloat, vertexDataLength> getVertexArray() { return vertices; }
+	std::array<unsigned int, indicesDataLength> getIndexArray() { return indices; }
 
 	GLuint getVertexArraySize() { return vertexArraySize; }
 	GLuint getIndexArraySize() { return indexArraySize; }
@@ -55,6 +56,8 @@ public:
 		delete texture;
 		texture = _texture; 
 	}
+
+	glm::vec3 getBBVertex(int index);
 
 	void addTextureFromFile(std::string textureFileString);
 
@@ -81,7 +84,9 @@ public:
 	void buildIndexArray1();
 	void buildIndexArray();
 
-	void buildBoundingBox();
+	void transformBoundingBox(glm::mat4 model);
+	void initBoundingBox();
+	void updateBounds();
 	GLfloat *getBoundingBox() { return boundingBox; }
 
 	void computeInterpolatedNormalsSmoothEdges();
@@ -92,13 +97,35 @@ public:
 
 	void swapColors(glm::vec3 color);
 
-private:
-	GLfloat boundingBox[24];
-	GLfloat* vertices;
-	unsigned int* indices;
+	GLfloat getXMinBound() { return xMinBound; }
+	GLfloat getXMaxBound() { return xMaxBound; }
 
-	GLuint vertexArraySize,
+	GLfloat getYMinBound() { return yMinBound; }
+	GLfloat getYMaxBound() { return yMaxBound; }
+
+	GLfloat getZMinBound() { return zMinBound; }
+	GLfloat getZMaxBound() { return zMaxBound; }
+private:
+	GLfloat 
+		immutableBoundingBox[24], // holds the original bounding box
+		boundingBox[24]; // copy that is transformed every frame
+	GLfloat 
+		xMinBound, xMaxBound, 
+		yMinBound, yMaxBound, 
+		zMinBound, zMaxBound;
+
+	//GLfloat vertices[vertexDataLength];
+	//unsigned int indices[indicesDataLength];
+
+	std::array<GLfloat, vertexDataLength> vertices;
+	std::array<unsigned int, indicesDataLength> indices;
+
+	GLuint 
+		vertexArraySize,
 		indexArraySize;
+
+
+
 
 	Mesh* mesh;
 

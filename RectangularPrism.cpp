@@ -9,13 +9,25 @@ RectangularPrism::RectangularPrism() {
 	rotationVector = glm::vec3(0.0f, 1.0f, 0.0f);
 	scalingVector = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	vertices = nullptr;
-	indices = nullptr;
+	//vertices = nullptr;
+	//indices = nullptr;
 
 	model = glm::mat4(1);
 	scale = glm::mat4(1);
 	texture = nullptr;
 	mesh = nullptr;
+
+	vertices = { 1.0f };
+
+	//boundingBox[24] = { 0 };
+	//immutableBoundingBox[24] = { 0 };
+
+	xMinBound = 0;
+	xMaxBound = 0;
+	yMinBound = 0;
+	yMaxBound = 0;
+	zMinBound = 0;
+	zMaxBound = 0;
 }
 
 RectangularPrism::~RectangularPrism() {
@@ -36,14 +48,38 @@ void RectangularPrism::initialize(std::string pickColor) {
 
 	model = glm::mat4(1);
 
+	initBoundingBox();
+
+}
+
+void RectangularPrism::transformBoundingBox(glm::mat4 model) {
+	// translate the box
+	for (int i = 0; i < 8; ++i) {
+		glm::vec4 vector = glm::vec4(
+			immutableBoundingBox[i * 3],
+			immutableBoundingBox[i * 3 + 1],
+			immutableBoundingBox[i * 3 + 2], 1.0f
+		);
+
+		glm::vec4 transformedVec = model * vector;
+
+		boundingBox[i * 3] = transformedVec.x;
+		boundingBox[i * 3 + 1] = transformedVec.y;
+		boundingBox[i * 3 + 2] = transformedVec.z;
+	}
+	//updateBounds();
 }
 
 void RectangularPrism::transform() {
 	model = glm::mat4(1);
+
 	model = glm::translate(model, translationVector);
+	transformBoundingBox(model);
 	model = glm::rotate(model, rotationAngle, rotationVector);
+	transformBoundingBox(model);
 	model = glm::scale(model, scalingVector);
-	//scaleTexture();
+	transformBoundingBox(model);
+	updateBounds();
 }
 
 glm::mat4 RectangularPrism::scaleTexture() {
@@ -53,7 +89,7 @@ glm::mat4 RectangularPrism::scaleTexture() {
 }
 
 void RectangularPrism::initMesh() {
-	mesh->createMesh(vertices, indices, vertexArraySize, indexArraySize);
+	mesh->createMesh(vertices.data(), indices.data(), vertexArraySize, indexArraySize);
 }
 
 void RectangularPrism::computeInterpolatedNormalsSmoothEdges() {
@@ -139,6 +175,14 @@ void RectangularPrism::computeInterpolatedNormalsSmoothEdges() {
 	}
 }
 
+glm::vec3 RectangularPrism::getBBVertex(int index) {
+	return glm::vec3(
+		boundingBox[3 * index],
+		boundingBox[3 * index + 1],
+		boundingBox[3 * index + 2]
+	);
+}
+
 void RectangularPrism::swapColors(glm::vec3 color) {
 	// each vertex has 8 components, and we want components 3,4,5
 	int limiter = vertexArraySize / numberOfVertexComponents;
@@ -206,7 +250,30 @@ void RectangularPrism::printIndexData() {
 	}
 }
 
-void RectangularPrism::buildBoundingBox() {
+void RectangularPrism::updateBounds() {
+	xMinBound = boundingBox[0];
+	xMaxBound = boundingBox[0];
+
+	yMinBound = boundingBox[1];
+	yMaxBound = boundingBox[1];
+
+	zMinBound = boundingBox[2];
+	zMaxBound = boundingBox[2];
+
+	for (int i = 0; i < 8; ++i) {
+		if (boundingBox[i * 3] < xMinBound) xMinBound = boundingBox[i * 3];
+		if (boundingBox[i * 3] > xMaxBound) xMaxBound = boundingBox[i * 3];
+
+		if (boundingBox[i * 3 + 1] < yMinBound) yMinBound = boundingBox[i * 3 + 1];
+		if (boundingBox[i * 3 + 1] > yMaxBound) yMaxBound = boundingBox[i * 3 + 1];
+
+		if (boundingBox[i * 3 + 2] < zMinBound) zMinBound = boundingBox[i * 3 + 2];
+		if (boundingBox[i * 3 + 2] > zMaxBound) zMaxBound = boundingBox[i * 3 + 2];
+	}
+	//std::cout << "";
+}
+
+void RectangularPrism::initBoundingBox() {
 
 	GLfloat xMin = vertices[0];
 	GLfloat xMax = vertices[0];
@@ -217,60 +284,60 @@ void RectangularPrism::buildBoundingBox() {
 	GLfloat zMin = vertices[2];
 	GLfloat zMax = vertices[2];
 	for (int i = 0; i < vertexDataLength / numberOfVertexComponents; ++i) {
-		if (vertices[i] < xMin) xMin = vertices[i];
-		if (vertices[i] > xMax) xMax = vertices[i];
+		if (vertices[numberOfVertexComponents * i] < xMin) xMin = vertices[numberOfVertexComponents * i];
+		if (vertices[numberOfVertexComponents * i] > xMax) xMax = vertices[numberOfVertexComponents * i];
 
-		if (vertices[i + 1] < yMin) yMin = vertices[i + 1];
-		if (vertices[i + 1] > yMax) yMax = vertices[i + 1];
+		if (vertices[numberOfVertexComponents * i + 1] < yMin) yMin = vertices[numberOfVertexComponents * i + 1];
+		if (vertices[numberOfVertexComponents * i + 1] > yMax) yMax = vertices[numberOfVertexComponents * i + 1];
 
-		if (vertices[i + 2] < zMin) zMin = vertices[i + 2];
-		if (vertices[i + 2] > zMax) zMax = vertices[i + 2];
+		if (vertices[numberOfVertexComponents * i + 2] < zMin) zMin = vertices[numberOfVertexComponents * i + 2];
+		if (vertices[numberOfVertexComponents * i + 2] > zMax) zMax = vertices[numberOfVertexComponents * i + 2];
 	}
 
 	// vertices are defined front to back, CCW starting bottom left
 	// vertex 0:
-	boundingBox[0] = xMin;
-	boundingBox[1] = yMin;
-	boundingBox[2] = zMax;
+	immutableBoundingBox[0] = xMin;
+	immutableBoundingBox[1] = yMin;
+	immutableBoundingBox[2] = zMax;
 
 	// vertex 1;:
-	boundingBox[3] = xMax;
-	boundingBox[4] = yMin;
-	boundingBox[5] = zMax;
+	immutableBoundingBox[3] = xMax;
+	immutableBoundingBox[4] = yMin;
+	immutableBoundingBox[5] = zMax;
 
 	//vertex 2
-	boundingBox[6] = xMax;
-	boundingBox[7] = yMax;
-	boundingBox[8] = zMax;
+	immutableBoundingBox[6] = xMax;
+	immutableBoundingBox[7] = yMax;
+	immutableBoundingBox[8] = zMax;
 
 	// vertex 3
-	boundingBox[9] = xMin;
-	boundingBox[10] = yMax;
-	boundingBox[11] = zMax;
+	immutableBoundingBox[9] = xMin;
+	immutableBoundingBox[10] = yMax;
+	immutableBoundingBox[11] = zMax;
 
 	// vertex 4
-	boundingBox[12] = xMin;
-	boundingBox[13] = yMin;
-	boundingBox[14] = zMin;
+	immutableBoundingBox[12] = xMin;
+	immutableBoundingBox[13] = yMin;
+	immutableBoundingBox[14] = zMin;
 
 	// vertex 5
-	boundingBox[15] = xMax;
-	boundingBox[16] = yMin;
-	boundingBox[17] = zMin;
+	immutableBoundingBox[15] = xMax;
+	immutableBoundingBox[16] = yMin;
+	immutableBoundingBox[17] = zMin;
 
 	// vertex 6
-	boundingBox[18] = xMax;
-	boundingBox[19] = yMax;
-	boundingBox[20] = zMin;
+	immutableBoundingBox[18] = xMax;
+	immutableBoundingBox[19] = yMax;
+	immutableBoundingBox[20] = zMin;
 
 	// vertex 7
-	boundingBox[21] = xMin;
-	boundingBox[22] = yMax;
-	boundingBox[23] = zMin;
+	immutableBoundingBox[21] = xMin;
+	immutableBoundingBox[22] = yMax;
+	immutableBoundingBox[23] = zMin;
 }
 
 void RectangularPrism::buildVertexArray1() {
-	vertices = new GLfloat[vertexDataLength]{
+	vertices = {
 		// Front face
 			// 0F: front bottom left
 			-0.5f, -0.5f, 0.5f, // x, y, z
@@ -424,7 +491,7 @@ void RectangularPrism::buildVertexArray1() {
 }
 
 void RectangularPrism::buildIndexArray1() {
-	indices = new unsigned int [indexArraySize] {
+	indices = {
 		0, 1, 2, // front left triangle
 		2, 3, 0, // front right triangle
 
@@ -447,77 +514,80 @@ void RectangularPrism::buildIndexArray1() {
 
 
 
-void RectangularPrism::buildVertexArray() {
-	vertices = new GLfloat[vertexArraySize]{
-		// 0: Front Bottom Left
-		-0.5f, -0.5f, 0.5f, // x, y, z
-		1.0f, 0.0f, 0.0f, // r, g, b
-		0.0f, 0.0f, // s, t
-		1.0f, 1.0f, 1.0f, // Normals nx, ny, nz
 
-		// 1: Bottom Front Right
-		0.5f, -0.5f, 0.5f,
-		0.0f, 1.0f, 0.0f,
-		1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f,
 
-		// 2: Front Top Right
-		0.5f, 0.5f, 0.5f,
-		0.0f, 0.0f, 1.0f,
-		1.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
 
-		// 3: Front Top Left
-		-0.5f, 0.5f, 0.5f,
-		1.0f, 0.0f, 0.0f,
-		0.0f, 1.0f,
-		1.0f, 1.0f, 1.0f,
-
-		// 4: Back Bottom Left
-		-0.5f, -0.5f, -0.5f,
-		0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f,
-		-1.0f, -1.0f, -1.0f,
-
-		// 5: Back Top Left 
-		0.5f, -0.5f, -0.5f,
-		0.0f, 0.0f, 1.0f,
-		1.0f, 0.0f,
-		-1.0f, -1.0f, -1.0f,
-
-		// 6: Back Top Right 
-		0.5f, 0.5f, -0.5f,
-		1.0f, 1.0f, 0.0f,
-		1.0f, 1.0f,
-		-1.0f, -1.0f, -1.0f,
-
-		// 7: Back Bottom Right
-		-0.5f, 0.5f, -0.5f,
-		0.0f, 1.0f, 1.0f,
-		0.0f, 1.0f,
-		-1.0f, -1.0f, -1.0f
-	};
-}
-
-void RectangularPrism::buildIndexArray() {
-	indices = new unsigned int [indexArraySize] {
-		0, 1, 2, // front left triangle
-		2, 3, 0, // front right triangle
-
-		5, 4, 7, // back left triangle
-		7, 6, 5, // back right triangle
-
-		4, 5, 1, // bottom left triangle
-		1, 0, 4, // bottom right triangle
-
-		1, 5, 6, // right left triangle
-		6, 2, 1, // right right triangle
-
-		3, 2, 6, // top left triangle
-		6, 7, 3, // top right triangle
-
-		4, 0, 3, // left left triangle
-		3, 7, 4, // left right triangle
-	};
-}
+//void RectangularPrism::buildVertexArray() {
+//	vertices = new GLfloat[vertexArraySize]{
+//		// 0: Front Bottom Left
+//		-0.5f, -0.5f, 0.5f, // x, y, z
+//		1.0f, 0.0f, 0.0f, // r, g, b
+//		0.0f, 0.0f, // s, t
+//		1.0f, 1.0f, 1.0f, // Normals nx, ny, nz
+//
+//		// 1: Bottom Front Right
+//		0.5f, -0.5f, 0.5f,
+//		0.0f, 1.0f, 0.0f,
+//		1.0f, 0.0f,
+//		1.0f, 1.0f, 1.0f,
+//
+//		// 2: Front Top Right
+//		0.5f, 0.5f, 0.5f,
+//		0.0f, 0.0f, 1.0f,
+//		1.0f, 1.0f,
+//		1.0f, 1.0f, 1.0f,
+//
+//		// 3: Front Top Left
+//		-0.5f, 0.5f, 0.5f,
+//		1.0f, 0.0f, 0.0f,
+//		0.0f, 1.0f,
+//		1.0f, 1.0f, 1.0f,
+//
+//		// 4: Back Bottom Left
+//		-0.5f, -0.5f, -0.5f,
+//		0.0f, 1.0f, 0.0f,
+//		0.0f, 0.0f,
+//		-1.0f, -1.0f, -1.0f,
+//
+//		// 5: Back Top Left 
+//		0.5f, -0.5f, -0.5f,
+//		0.0f, 0.0f, 1.0f,
+//		1.0f, 0.0f,
+//		-1.0f, -1.0f, -1.0f,
+//
+//		// 6: Back Top Right 
+//		0.5f, 0.5f, -0.5f,
+//		1.0f, 1.0f, 0.0f,
+//		1.0f, 1.0f,
+//		-1.0f, -1.0f, -1.0f,
+//
+//		// 7: Back Bottom Right
+//		-0.5f, 0.5f, -0.5f,
+//		0.0f, 1.0f, 1.0f,
+//		0.0f, 1.0f,
+//		-1.0f, -1.0f, -1.0f
+//	};
+//}
+//
+//void RectangularPrism::buildIndexArray() {
+//	indices = new unsigned int [indexArraySize] {
+//		0, 1, 2, // front left triangle
+//		2, 3, 0, // front right triangle
+//
+//		5, 4, 7, // back left triangle
+//		7, 6, 5, // back right triangle
+//
+//		4, 5, 1, // bottom left triangle
+//		1, 0, 4, // bottom right triangle
+//
+//		1, 5, 6, // right left triangle
+//		6, 2, 1, // right right triangle
+//
+//		3, 2, 6, // top left triangle
+//		6, 7, 3, // top right triangle
+//
+//		4, 0, 3, // left left triangle
+//		3, 7, 4, // left right triangle
+//	};
+//}
 

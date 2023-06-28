@@ -21,6 +21,7 @@
 #include "DirectionalLight.hpp"
 #include "PointLight.hpp"
 #include "Material.hpp"
+#include "CameraBall.hpp"
 
 class GlfwGame {
 private:
@@ -47,6 +48,7 @@ private:
 
 	GlfwWindow *glfwWindow;
 	GlfwCamera glfwCamera;
+	CameraBall cameraBall;
 
 	Texture *dirtTexture, *brickTexture, *grassTexture, *boxTexture,
 		*rustTexture, *plainTexture;
@@ -74,8 +76,47 @@ public:
 		lastTime = 0.0f;
 
 		glfwWindow = NULL;
-		
+		//cameraBall = CameraBall();
 	}
+
+	void foundCollisionAABB2(RectangularPrism *rp) {
+		glm::vec3 cameraPosition = cameraBall.getCamera()->getCameraPosition();
+
+		GLfloat x = glm::max(
+			rp->getXMinBound(), glm::min(cameraPosition.x, rp->getXMaxBound()));
+
+		GLfloat y = glm::max(
+			rp->getYMinBound(), glm::min(cameraPosition.y, rp->getYMaxBound()));
+
+		GLfloat z = glm::max(
+			rp->getZMinBound(), glm::min(cameraPosition.z, rp->getZMaxBound()));
+
+		GLfloat distanceY = glm::sqrt(
+			(x - cameraPosition.x) * (x - cameraPosition.x)
+			+ (y - cameraPosition.y) * (y - cameraPosition.y)
+			+ (z - cameraPosition.z) * (z - cameraPosition.z)
+		);
+
+		//std::cout << " x " << x << " - " << cameraPosition.x 
+		//	<< " = " << (x - cameraPosition.x) << std::endl;
+
+		//std::cout << " y " << y << " - " << cameraPosition.y
+		//	<< " = " << (y - cameraPosition.y) << std::endl;
+
+		//std::cout << " z " << x << " - " << cameraPosition.z
+		//	<< " = " << (z - cameraPosition.z) << std::endl;
+
+		glm::vec3 lastLegalPosition = glm::vec3(x, y, z);
+		if (distanceY < cameraBall.getEyeHeight()) {
+			glm::vec3 newPosition = cameraBall.getCamera()->getLastPosition();
+			cameraBall.getCamera()->setLastPosition(cameraPosition);
+			cameraBall.getCamera()
+				->setCurrentPosition(newPosition);
+		}
+	}
+
+
+
 
 	// Define a callback function
 	void DebugMessageCallback(GLenum source, GLenum type, GLuint id, 
@@ -97,7 +138,7 @@ public:
 		glfwWindow->initialize();
 
 		glfwCamera = GlfwCamera();
-
+		cameraBall = CameraBall(&glfwCamera);
 
 		GLfloat vertices[] = {
 			-1.0f, -1.0, 0.0f, // location
@@ -382,6 +423,10 @@ public:
 
 	}
 
+	void findShortestPath() {
+
+	}
+
 	void addNewBrush(
 		std::string color,
 		Texture* texture,
@@ -419,9 +464,13 @@ public:
 			deltaTime = now - lastTime; // 1000*(now - lastTime) / SDL_GetPerformanceFrequency();
 			lastTime = now;
 
+			// update collisions
+			cameraBall.applyGravity();
+
 			// Get and handle user input events
 			glfwPollEvents();
-			glfwCamera.keyControl(glfwWindow->getKeys(), deltaTime);
+			glfwCamera.keyControl(glfwWindow->getKeys(), 
+				glfwWindow->getKeyHit(), deltaTime);
 			glfwCamera.mouseControl(glfwWindow->getMouseDeltaX(),
 				glfwWindow->getMouseDeltaY());
 
@@ -491,6 +540,7 @@ public:
 				glm::value_ptr(glfwCamera.calculateViewMatrix()));
 			int i = 0;
 			for (RectangularPrism* prism : prisms) {
+
 				if (i == 90) {
 					shaders[1]->useShader();
 					uniformModel = shaders[1]->getModelLocation();
@@ -514,6 +564,7 @@ public:
 				}
 
 				prism->transform();
+				foundCollisionAABB2(prism);
 
 				// access uniform variables for shaders
 				glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
@@ -539,7 +590,8 @@ public:
 				++i;
 			}
 
-			
+			cameraBall.getCamera()->setLastPosition(
+				cameraBall.getCamera()->getCameraPosition());
 
 			//// Use Textures
 			//prisms[0]->getTexture().useTexture();

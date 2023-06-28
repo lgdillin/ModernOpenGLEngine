@@ -89,6 +89,15 @@
     <ClInclude Include="CameraBall.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="MeshCollider.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Simplex.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ManifoldPoints.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
