@@ -10,6 +10,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/trigonometric.hpp>
+
+#include <assimp/Importer.hpp>
 
 
 #include "GlfwWindow.hpp"
@@ -22,7 +25,9 @@
 #include "PointLight.hpp"
 #include "Material.hpp"
 #include "CameraBall.hpp"
-#include "MeshCollider.hpp"
+#include "SpotLight.hpp"
+#include "MeshGroup.hpp"
+//#include "MeshCollider.hpp"
 
 class GlfwGame {
 private:
@@ -54,16 +59,21 @@ private:
 	Texture *dirtTexture, *brickTexture, *grassTexture, *boxTexture,
 		*rustTexture, *plainTexture;
 	
-	Material shinyMaterial, dullMaterial;
+	Material shinyMaterial, dullMaterial, superShinyMaterial;
 
 	DirectionalLight directionalLight;
 	PointLight pointLights[MAX_POINT_LIGHTS];
+	SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 	unsigned int pointLightCount;
 
 	GLenum error;
 
-	MeshCollider MeshCollider;
+	MeshGroup plant;
+
+	//MeshCollider MeshCollider;
+
+	//Assimp::Importer *importer;
 
 public:
 	GlfwGame() {
@@ -135,7 +145,7 @@ public:
 		glEnable(GL_DEBUG_OUTPUT);
 		//glDebugMessageCallback(DebugMessageCallback, nullptr);
 		// Initialize GLFW
-
+		//Assimp::Importer importer = Assimp::Importer();
 
 		glfwWindow = new GlfwWindow(800, 600);
 		glfwWindow->initialize();
@@ -173,8 +183,8 @@ public:
 		directionalLight = DirectionalLight(
 			glm::vec3(1.0f, 3.0f, 1.0f),
 			glm::vec3(1.0f, 1.0f, 1.0f),
-			0.2f,
-			0.3f
+			0.1f,
+			0.2f
 		);
 
 		pointLights[0] = PointLight(
@@ -189,20 +199,43 @@ public:
 			glm::vec3(10.0f, 6.0f, 22.5f),
 			glm::vec3(1.0f, 0.5f, 0.0f)
 		);
-		//pointLightCount = 3;
+		
+		spotLights[0] = SpotLight(glm::vec3(0.0f, 10.0f, 0.0f));
+		spotLights[0].setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
+		spotLights[0].setEdge(20.0f);
+		spotLights[0].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+
+		spotLights[1] = SpotLight(glm::vec3(12.0f, 4.0f, 5.0f));
+		spotLights[1].setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
+		spotLights[1].setConstantFactor(0.02f);
+		spotLights[1].setLinearFactor(0.006f);
+		spotLights[1].setEdge(30.0f);
+		spotLights[1].setColor(glm::vec3(1.0f, 0.0f, 1.0f));
+
+		spotLights[2] = SpotLight(glm::vec3(10.0f, 4.0f, 14.5f));
+		spotLights[2].setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
+		spotLights[2].setEdge(65.0f);
+		spotLights[2].setColor(glm::vec3(0.0f, 1.0f, 1.0f));
+
+		// Flashlight
+		spotLights[3] = SpotLight(glfwCamera.getCameraPosition());
+		spotLights[3].setDirection(glfwCamera.getCameraFront());
+		spotLights[3].setEdge(10.0f);
+		spotLights[3].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+
 
 		brickTexture = new Texture("resources/brick.png");
-		brickTexture->loadTexture();
+		brickTexture->loadTextureAlphaOption(true);
 		dirtTexture = new Texture("resources/dirt.png");
-		dirtTexture->loadTexture();
+		dirtTexture->loadTextureAlphaOption(true);
 		grassTexture = new Texture("resources/grass.png");
-		grassTexture->loadTexture();
+		grassTexture->loadTextureAlphaOption(true);
 		boxTexture = new Texture("resources/box.png");
-		boxTexture->loadTexture();
+		boxTexture->loadTextureAlphaOption(true);
 		rustTexture = new Texture("resources/rusty.png");
-		rustTexture->loadTexture();
+		rustTexture->loadTextureAlphaOption(true);
 		plainTexture = new Texture("resources/plain.png");
-		plainTexture->loadTexture();
+		plainTexture->loadTextureAlphaOption(true);
 
 		std::string vShader = "./vertexShader.vert";
 		std::string fShader = "./fragmentShader.frag";
@@ -217,7 +250,13 @@ public:
 		shaders.push_back(shader2);
 
 		shinyMaterial = Material(1.0f, 32);
-		dullMaterial = Material(0.3f, 4);
+		//dullMaterial = Material(0.4f, 8);
+		dullMaterial = Material(1.0f, 64);
+
+		superShinyMaterial = Material(1.0f, 128);
+
+		plant = MeshGroup();
+		plant.load("resources/12221_Cat_v1_l3.obj");
 
 		// floor1
 		addNewBrush(
@@ -459,7 +498,7 @@ public:
 		float triangleIncrementalValue = 0.0002f;
 
 		float incrementArgument = 1.0f;
-		float sinArgument = 1.0f;
+		float sinArgument = 0.0f;
 		float sinColor = 0.0f;
 
 		while (!glfwWindow->getShouldClose()) {
@@ -468,7 +507,7 @@ public:
 			lastTime = now;
 
 			// update collisions
-			cameraBall.applyGravity();
+			//cameraBall.applyGravity();
 
 			// Get and handle user input events
 			glfwPollEvents();
@@ -476,6 +515,13 @@ public:
 				glfwWindow->getKeyHit(), deltaTime);
 			glfwCamera.mouseControl(glfwWindow->getMouseDeltaX(),
 				glfwWindow->getMouseDeltaY());
+
+			// toggle flashlight
+			if (glfwCamera.getToggleFlashlight()) {
+				spotLights[3].setColor(glm::vec3(0.0f, 0.0f, 0.0f));
+			} else {
+				spotLights[3].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+			}
 
 			if (directionToggle) {
 				triangleOffset += triangleIncrementalValue;
@@ -526,6 +572,12 @@ public:
 			//error = glGetError(); std::cout << error;
 			shaders[0]->setPointLights(pointLights, 3);
 			//error = glGetError(); std::cout << error;
+			shaders[0]->setSpotLights(spotLights, 4);
+
+			glm::vec3 flashPos = glfwCamera.getCameraPosition();
+			flashPos.y = flashPos.y - 0.3f;
+			spotLights[3].setFlash(flashPos,
+				glfwCamera.getCameraFront());
 
 			sinArgument += 0.03f;
 			incrementArgument += 0.05f;
@@ -567,7 +619,7 @@ public:
 				}
 
 				prism->transform();
-				foundCollisionAABB2(prism);
+				//foundCollisionAABB2(prism);
 
 				// access uniform variables for shaders
 				glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
@@ -578,89 +630,34 @@ public:
 				//prism->printVertexData();
 
 				prism->getTexture()->useTexture();
-				//error = glGetError(); std::cout << error;
 
 				if (i == 20) {
-					shinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+					superShinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 				} else {
 					dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
-					//shinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
 				}
 				prism->renderMesh();
-
-				//prism->printVertexData();
-
 				++i;
 			}
 
+			glm::mat4 model1 = glm::mat4(1);
+			model1 = glm::translate(model1, glm::vec3(10.0f, 0.5f, 22.5f));
+			//model1 = glm::translate(model1, glm::vec3(3.0f, 0.0f, 0.0f));
+			model1 = glm::rotate(model1, glm::radians(-90.0f),
+				glm::vec3(1.0f, 0.0f, 0.0f));
+
+			
+			model1 = glm::rotate(model1, glm::radians(incrementArgument), glm::vec3(0.0f, 0.0f, 1.0f));
+			model1 = glm::translate(model1, glm::vec3(-2.0f, 0.0f, 0.0f));
+
+			model1 = glm::scale(model1, glm::vec3(0.03f, 0.03f, 0.03f));
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+				glm::value_ptr(model1));
+
+			plant.render();
+
 			cameraBall.getCamera()->setLastPosition(
 				cameraBall.getCamera()->getCameraPosition());
-
-			//// Use Textures
-			//prisms[0]->getTexture().useTexture();
-			//prisms[0]->renderMesh();
-
-
-
-			//// PRISM 1
-			//prisms[1]->setTranslationVector(glm::vec3(0.0f, 3.0f, 4.5f));
-			//prisms[1]->setRotationAngle(0.0f);
-			//prisms[1]->setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
-			//prisms[1]->setScalingVector(glm::vec3(10.0f, 5.0f, 1.0f));
-			//prisms[1]->transform();
-			//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, 
-			//	glm::value_ptr(prisms[1]->getModelMatrix()));
-
-			//// Use Textures
-			//prisms[1]->getTexture().useTexture();
-			//prisms[1]->renderMesh();
-
-			//// Make a floor
-			//model = glm::mat4(1);
-			//model = glm::translate(model,
-			//	glm::vec3(0.0f, 0.0f, 0.0f));
-			//model = glm::rotate(model, 0.0f,
-			//	glm::vec3(0.0f, 1.0f, 0.0f));
-			//model = glm::scale(model, glm::vec3(10.0f, 1.0f, 10.0f));
-			//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-			//grassTexture.useTexture();
-			//meshes[2]->renderMesh();
-
-			//// Make a floor
-			//model = glm::mat4(1);
-			//model = glm::translate(model,
-			//	glm::vec3(4.5f, 3.0f, 0.0f));
-			//model = glm::rotate(model, 0.0f,
-			//	glm::vec3(0.0f, 1.0f, 0.0f));
-			//model = glm::scale(model, glm::vec3(1.0f, 5.0f, 8.0f));
-			//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-			//brickTexture.useTexture();
-			//meshes[3]->renderMesh();
-
-			//// Make a floor
-			//model = glm::mat4(1);
-			//model = glm::translate(model,
-			//	glm::vec3(-4.5f, 3.0f, 0.0f));
-			//model = glm::rotate(model, 0.0f,
-			//	glm::vec3(0.0f, 1.0f, 0.0f));
-			//model = glm::scale(model, glm::vec3(1.0f, 5.0f, 8.0f));
-			//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-			//brickTexture.useTexture();
-			//meshes[4]->renderMesh();
-
-			//model = glm::mat4(1);
-			//model = glm::translate(model,
-			//	glm::vec3(0.0f, 3.0f, 0.0f));
-			//model = glm::rotate(model, sinArgument * toRadians,
-			//	glm::vec3(0.0f, 1.0f, 0.0f));
-			//model = glm::scale(model, glm::vec3(1.0f, 1.0f, 1.0f));
-			//glUniformMatrix4fv(uniformModel, 1, GL_FALSE, glm::value_ptr(model));
-
-			//dirtTexture.useTexture();
-			//meshes[5]->renderMesh();
 
 			glUseProgram(0); // Unbinds the shader
 

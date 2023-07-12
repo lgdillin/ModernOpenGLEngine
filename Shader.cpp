@@ -6,6 +6,7 @@ Shader::Shader() {
 	uniformProjection = 0;
 	uniformView = 0;
 	pointLightCount = 0;
+	spotLightCount = 0;
 }
 
 Shader::~Shader() {
@@ -131,6 +132,31 @@ void Shader::setPointLights(
 	}
 }
 
+void Shader::setSpotLights(
+	SpotLight *spotLight, 
+	unsigned int lightCount
+) {
+	if (lightCount > MAX_SPOT_LIGHTS) {
+		lightCount = MAX_SPOT_LIGHTS;
+	}
+
+	glUniform1i(uniformSpotLightCount, lightCount);
+
+	for (int i = 0; i < MAX_SPOT_LIGHTS; ++i) {
+		spotLight[i].useLight(
+			uniformSpotLight[i].uniformAmbientIntensity,
+			uniformSpotLight[i].uniformColor,
+			uniformSpotLight[i].uniformDiffuseIntensity,
+			uniformSpotLight[i].uniformPosition,
+			uniformSpotLight[i].uniformDirection,
+			uniformSpotLight[i].uniformConstant,
+			uniformSpotLight[i].uniformLinear,
+			uniformSpotLight[i].uniformQuadratic,
+			uniformSpotLight[i].uniformEdge
+		);
+	}
+}
+
 
 void Shader::useShader() {
 	if (!shaderId) {
@@ -229,7 +255,15 @@ void Shader::compileShader(
 	uniformPointLightCount = glGetUniformLocation(shaderId, 
 		"pointLightCount");
 
-	//std::string locationBuffer = std::string();
+	uniformSpotLightCount = glGetUniformLocation(shaderId,
+		"spotLightCount");
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Error binding Uniform Values " << error << std::endl;
+	}
+
+	// For the point lights
 	for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
 		char locationBuffer[99] = { '\0' };
 		//locationBuffer = std::string();
@@ -263,6 +297,58 @@ void Shader::compileShader(
 			"pointLights[%d].quadratic", i);
 		uniformPointLight[i].uniformQuadratic = glGetUniformLocation(shaderId, locationBuffer);
 	}
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Error binding uniform pointLight values " << error << std::endl;
+	}
+
+	// For the spot lights
+	for (int i = 0; i < MAX_SPOT_LIGHTS; ++i) {
+		char locationBuffer[99] = { '\0' };
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].basePointLight.basicLight.color", i);
+		uniformSpotLight[i].uniformColor = glGetUniformLocation(shaderId, locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].basePointLight.basicLight.ambientIntensity", i);
+		uniformSpotLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderId, locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].basePointLight.basicLight.diffuseIntensity", i);
+		uniformSpotLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderId, locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].basePointLight.position", i);
+		uniformSpotLight[i].uniformPosition = glGetUniformLocation(shaderId, locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].basePointLight.constant", i);
+		uniformSpotLight[i].uniformConstant = glGetUniformLocation(shaderId, locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].basePointLight.linear", i);
+		uniformSpotLight[i].uniformLinear = glGetUniformLocation(shaderId, locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].basePointLight.quadratic", i);
+		uniformSpotLight[i].uniformQuadratic = glGetUniformLocation(shaderId, locationBuffer);
+	
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].direction", i);
+		uniformSpotLight[i].uniformDirection = glGetUniformLocation(shaderId, locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"spotLights[%d].edge", i);
+		uniformSpotLight[i].uniformEdge = glGetUniformLocation(shaderId, locationBuffer);
+	}
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Error binding uniform pointLight values " << error << std::endl;
+	}
+
 }
 
 void Shader::addShader(

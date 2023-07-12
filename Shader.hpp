@@ -9,8 +9,10 @@
 
 #include "PointLight.hpp"
 #include "DirectionalLight.hpp"
+#include "SpotLight.hpp"
 
 #define MAX_POINT_LIGHTS 3
+#define MAX_SPOT_LIGHTS 4
 
 class Shader {
 public:
@@ -36,6 +38,7 @@ public:
 
 	void setDirectionalLight(DirectionalLight *dLight);
 	void setPointLights(PointLight *pointLight, unsigned int lightCount);
+	void setSpotLights(SpotLight *spotLight, unsigned int lightCount);
 
 	void useShader();
 	void clearShader();
@@ -61,6 +64,19 @@ private:
 		GLuint uniformQuadratic;
 	} uniformPointLight[MAX_POINT_LIGHTS];
 
+	struct {
+		GLuint uniformColor;
+		GLuint uniformAmbientIntensity;
+		GLuint uniformDiffuseIntensity;
+
+		GLuint uniformPosition;
+		GLuint uniformDirection;
+		GLuint uniformConstant;
+		GLuint uniformLinear;
+		GLuint uniformQuadratic;
+		GLuint uniformEdge;
+	} uniformSpotLight[MAX_SPOT_LIGHTS];
+
 	// compiles a shader from a string literal or from a read file
 	void compileShader(
 		std::string vertexCode, 
@@ -73,7 +89,7 @@ private:
 		GLenum shaderType
 	);
 
-	int pointLightCount;
+	int pointLightCount, spotLightCount;
 
 	GLuint 
 		shaderId, 
@@ -88,6 +104,7 @@ private:
 		uniformEyePosition,
 		uniformSpecularIntensity,
 		uniformShininess,
-		uniformPointLightCount;
+		uniformPointLightCount,
+		uniformSpotLightCount;
 
 };

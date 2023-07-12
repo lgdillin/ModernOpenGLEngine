@@ -1,5 +1,6 @@
 #version 330
 #define MAX_POINT_LIGHTS 3
+#define MAX_SPOT_LIGHTS 4
 
 in vec4 vertexColor;
 in vec2 texCoords;
@@ -30,22 +31,32 @@ struct PointLight {
 	float quadratic;
 };
 
+struct SpotLight {
+	PointLight basePointLight;
+	vec3 direction;
+	float edge;
+};
+
 struct Material {
 	float specularIntensity;
 	float shininess;
 };
 
 uniform int pointLightCount;
+uniform int spotLightCount;
 
 uniform sampler2D texture0;
 uniform Material material;
 
 uniform DirectionalLight directionalLight;
 uniform PointLight pointLights[MAX_POINT_LIGHTS];
+uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform vec3 eyePosition;
 
 vec4 calculateLightUsingDirVec(Light _basicLight, vec3 _direction) {
+
+
 	vec4 ambientColor = vec4(_basicLight.color, 1.0) 
 		* _basicLight.ambientIntensity;
 
@@ -123,32 +134,71 @@ vec4 calculateLightUsingDirVec(Light _basicLight, vec3 _direction) {
 	return (ambientColor + diffuseColor + specularColor);
 }
 
+vec4 calculatePointLight(PointLight pLight) {
+	// Get the vector pointing from the pointlight to the fragment
+	// ie. getting the Direction of the fragment from the pointLight
+	vec3 direction =  fragmentPosition - pLight.position;
+
+	float _distance = length(direction); // 'distance' is reserved
+	direction = normalize(direction);
+
+	vec4 lightDirection = calculateLightUsingDirVec(
+		pLight.basicLight, direction);
+
+	float attenuation = 
+		pLight.quadratic * _distance * _distance // ax^2
+		+ pLight.linear * _distance // bx 
+		+ pLight.constant;
+
+	return (lightDirection / attenuation);
+}
+
+vec4 calculateSpotLight(SpotLight sLight) {
+	vec3 rayDirection = normalize(
+		fragmentPosition - sLight.basePointLight.position);
+
+	// Calculate what the spot light factor is 
+	// factor which decides whether or not to light the frag in question 
+	float spotLightFactor = dot(rayDirection, normalize(sLight.direction));
+
+	// the larger the factor gets, the more we are in cone of influence
+	if(spotLightFactor > sLight.edge) {
+		vec4 pLightColor = calculatePointLight(sLight.basePointLight);
+		//return (pLightColor * (1.0 - spotLightFactor) * (1.0 / (1.0 - sLight.edge)));
+		
+		// Attenuation function 
+		//return (pLightColor / sLight.edge);
+		return pLightColor 
+			* (1.0 - (1.0 - spotLightFactor) * (1.0 / (1.0 - sLight.edge)));
+	} else {
+		return vec4(0, 0, 0, 0);
+	}
+}
+
 vec4 calculateDirectionalLight() {
 	return calculateLightUsingDirVec(
 		directionalLight.basicLight,
 		directionalLight.direction);
 }
 
-vec4 calculatePointLight() {
+vec4 calculateTotalSpotLights() {
+	vec4 spotLightColor = vec4(0, 0, 0, 0);
+
+	for(int i = 0; i < spotLightCount; ++i) {
+		// Get the vector pointing from the spot light to the fragment
+		// ie. getting the Direction of the fragment from the spotLight
+		spotLightColor += calculateSpotLight(spotLights[i]);
+	}
+	return spotLightColor;
+}
+
+vec4 calculateTotalPointLights() {
 	vec4 pointLightColor = vec4(0, 0, 0, 0);
 
 	for(int i = 0; i < pointLightCount; ++i) {
 		// Get the vector pointing from the pointlight to the fragment
 		// ie. getting the Direction of the fragment from the pointLight
-		vec3 direction =  fragmentPosition - pointLights[i].position;
-
-		float _distance = length(direction); // 'distance' is reserved
-		direction = normalize(direction);
-
-		vec4 lightDirection = calculateLightUsingDirVec(
-			pointLights[i].basicLight, direction);
-
-		float attenuation = 
-			pointLights[i].quadratic * _distance * _distance // ax^2
-			+ pointLights[i].linear * _distance // bx 
-			+ pointLights[i].constant;
-
-		pointLightColor += (lightDirection / attenuation);
+		pointLightColor += calculatePointLight(pointLights[i]);
 	}
 	return pointLightColor;
 }
@@ -159,7 +209,11 @@ void main() {
 	// Lighting modes /////
 	//////////////////////
 
-	vec4 computedLightColor = calculateDirectionalLight() + calculatePointLight();
+	vec4 computedLightColor = 
+		calculateDirectionalLight() 
+		+ calculateTotalPointLights()
+		+ calculateTotalSpotLights();
+
 	color = texture(texture0, texCoords) * computedLightColor;
 
 	// Texture, ambient, directional, pointLight

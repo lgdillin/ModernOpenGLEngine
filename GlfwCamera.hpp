@@ -30,6 +30,9 @@ public:
 		//position = glm::vec3(0.0f, 3.0f, 2.0f);
 		lastPosition = position;
 
+		toggleGravity = false;
+		toggleFlashLight = true;
+
 		update();
 	}
 
@@ -39,6 +42,10 @@ public:
 
 	glm::vec3 getCameraPosition() {
 		return position;
+	}
+
+	glm::vec3 getCameraFront() {
+		return glm::normalize(front);
 	}
 
 	glm::mat4 calculateViewMatrix() {
@@ -69,11 +76,15 @@ public:
 		position = current;
 	}
 
+	bool getToggleGravity() { return toggleGravity; }
 	void setToggleGravity(bool g) {
 		toggleGravity = g;
 	}
 
-	bool getToggleGravity() { return toggleGravity; }
+	bool getToggleFlashlight() { return toggleFlashLight; }
+	void setToggleFlashlight(bool f) {
+		toggleFlashLight = f;
+	}
 
 	void bumpCamera(glm::vec3 bump) {
 		// Moves the camera by a small amount (collision detection
@@ -83,6 +94,11 @@ public:
 
 	void keyControl(bool* keys, bool* keyHit, GLfloat deltaTime) {
 		GLfloat velocity = movementSpeed * deltaTime;
+
+		// sprint
+		if (keys[GLFW_KEY_LEFT_SHIFT]) {
+			velocity *= 8.0f;
+		}
 
 		if (keys[GLFW_KEY_W]) {
 			position += front * velocity;
@@ -96,6 +112,7 @@ public:
 			position -= right * velocity;
 		}
 
+		// Gravity
 		if (keys[GLFW_KEY_G]) {
 			if (keyHit[GLFW_KEY_G] == false) {
 				keyHit[GLFW_KEY_G] = true;
@@ -103,6 +120,16 @@ public:
 			}
 		} else {
 			keyHit[GLFW_KEY_G] = false;
+		}
+
+		// flashlight
+		if (keys[GLFW_KEY_F]) {
+			if (keyHit[GLFW_KEY_F] == false) {
+				keyHit[GLFW_KEY_F] = true;
+				setToggleFlashlight(!toggleFlashLight);
+			}
+		} else {
+			keyHit[GLFW_KEY_F] = false;
 		}
 
 
@@ -147,7 +174,7 @@ private:
 	GLfloat movementSpeed;
 	GLfloat turnSpeed;
 
-	bool toggleGravity;
+	bool toggleGravity, toggleFlashLight;
 
 	void update() {
 		front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));

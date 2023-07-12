@@ -21,13 +21,16 @@ Texture::~Texture() {
 	clearTexture();
 }
 
-void Texture::loadTexture() {
+bool Texture::loadTextureAlphaOption(bool alphaMode) {
+
+	int stbiMode = alphaMode ? STBI_rgb_alpha : STBI_rgb;
 	unsigned char* textureData = stbi_load(fileLocation.c_str(), &width,
-		&height, &bitDepth, STBI_rgb_alpha);
+		&height, &bitDepth, stbiMode);
 
 	if (!textureData) {
-		std::cout << "failed to find file" << fileLocation << std::endl;
-		return;
+		std::cout << "failed to load/find " << fileLocation 
+			<< " check location or mode " << std::endl;
+		return false;
 	}
 
 	// Generate a texture id and bind to the buffer
@@ -42,14 +45,18 @@ void Texture::loadTexture() {
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, 
-		GL_RGBA, GL_UNSIGNED_BYTE, textureData);
+	GLint glMode = alphaMode ? GL_RGBA : GL_RGB;
+
+	glTexImage2D(GL_TEXTURE_2D, 0, glMode, width, height, 0,
+		glMode, GL_UNSIGNED_BYTE, textureData);
 
 	glGenerateMipmap(GL_TEXTURE_2D);
 
 	glBindTexture(GL_TEXTURE_2D, 0);
 
 	stbi_image_free(textureData);
+
+	return true;
 }
 
 

@@ -119,7 +119,7 @@ public:
 		}
 
 		if (minDistance == FLT_MAX) {
-			return;
+			//return;
 		}
 
 	

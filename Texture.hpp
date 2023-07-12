@@ -10,7 +10,7 @@ public:
 	Texture(std::string _fileLocation);
 	~Texture();
 
-	void loadTexture();
+	bool loadTextureAlphaOption(bool alphaMode);
 	void useTexture();
 	void clearTexture();
 
