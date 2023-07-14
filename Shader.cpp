@@ -157,6 +157,15 @@ void Shader::setSpotLights(
 	}
 }
 
+void Shader::setTexture(GLuint textureUnit) {
+}
+
+void Shader::setDirectionalShadowMap(GLuint textureUnit) {
+}
+
+void Shader::setDirectionalLightTransform(glm::mat4 *transform) {
+}
+
 
 void Shader::useShader() {
 	if (!shaderId) {
@@ -349,6 +358,12 @@ void Shader::compileShader(
 		std::cout << "Error binding uniform pointLight values " << error << std::endl;
 	}
 
+	uniformTexture = glGetUniformLocation(shaderId, "texture0");
+
+	uniformDirectionalLightTransform = glGetUniformLocation(shaderId, 
+		"directionalLightTransform");
+	uniformDirectionalShadowMap = glGetUniformLocation(shaderId, 
+		"directionalShadowMap");
 }
 
 void Shader::addShader(

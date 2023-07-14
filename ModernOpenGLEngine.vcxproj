@@ -145,6 +145,7 @@
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RectangularPrism.cpp" />
     <ClCompile Include="Shader.cpp" />
+    <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
   </ItemGroup>
@@ -170,12 +171,15 @@
     <ClInclude Include="RectangularPrism.hpp" />
     <ClInclude Include="SdlWindow.hpp" />
     <ClInclude Include="Shader.hpp" />
+    <ClInclude Include="ShadowMap.hpp" />
     <ClInclude Include="Simplex.hpp" />
     <ClInclude Include="SpotLight.hpp" />
     <ClInclude Include="Texture.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="CameraAndUserInput.md" />
+    <None Include="vDirectionalShadowMap.vert" />
+    <None Include="fDirectionalShadowMap.frag" />
     <None Include="fragmentShaderColor.frag" />
     <None Include="InterpolationIndexedDrawsProjections.md" />
     <None Include="fragmentShader.frag" />

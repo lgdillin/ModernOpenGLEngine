@@ -6,6 +6,7 @@ in vec4 vertexColor;
 in vec2 texCoords;
 in vec3 normals;
 in vec3 fragmentPosition;
+in vec4 directionalLightSpacePos;
 
 out vec4 color;
 
@@ -46,6 +47,7 @@ uniform int pointLightCount;
 uniform int spotLightCount;
 
 uniform sampler2D texture0;
+uniform sampler2D directionalShadowMap;
 uniform Material material;
 
 uniform DirectionalLight directionalLight;
@@ -54,7 +56,35 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform vec3 eyePosition;
 
-vec4 calculateLightUsingDirVec(Light _basicLight, vec3 _direction) {
+float calcDirectionalShadowFactor(DirectionalLight dLight) {
+	
+	// by dividing by w our coords will be [-1,1]
+	vec3 projectionCoords = directionalLightSpacePos.xyz 
+		/ directionalLightSpacePos.w;
+
+	// now -1 is being mapped to 0.0. (values now fall between [0,1])
+	projectionCoords = (projectionCoords * 0.5) + 0.5;
+
+	// seems to pick a value from the nearest plane
+	float nearestDepth = texture(directionalShadowMap, projectionCoords.xy).r;
+
+	// we now know where the light says the closest point is in that direction (xy)
+	// however its not necessarily the point we're looking at.
+	// the actual point we're looking at is the entire 
+
+	// how far away the point is from the actual light
+	float currentDepth = projectionCoords.z;
+
+	float shadow = currentDepth > nearestDepth ? 1.0 : 0.0;
+
+	return shadow;
+}
+
+vec4 calculateLightUsingDirVec(
+	Light _basicLight, 
+	vec3 _direction, 
+	float _shadowFactor
+) {
 
 
 	vec4 ambientColor = vec4(_basicLight.color, 1.0) 
@@ -131,7 +161,8 @@ vec4 calculateLightUsingDirVec(Light _basicLight, vec3 _direction) {
 		}
 	}
 
-	return (ambientColor + diffuseColor + specularColor);
+	return (ambientColor + (1.0 - _shadowFactor ) 
+		* (diffuseColor + specularColor));
 }
 
 vec4 calculatePointLight(PointLight pLight) {
@@ -143,7 +174,7 @@ vec4 calculatePointLight(PointLight pLight) {
 	direction = normalize(direction);
 
 	vec4 lightDirection = calculateLightUsingDirVec(
-		pLight.basicLight, direction);
+		pLight.basicLight, direction, 0.0);
 
 	float attenuation = 
 		pLight.quadratic * _distance * _distance // ax^2
@@ -176,9 +207,12 @@ vec4 calculateSpotLight(SpotLight sLight) {
 }
 
 vec4 calculateDirectionalLight() {
+	float shadowFactor = calcDirectionalShadowFactor(directionalLight);
+
 	return calculateLightUsingDirVec(
 		directionalLight.basicLight,
-		directionalLight.direction);
+		directionalLight.direction,
+		shadowFactor);
 }
 
 vec4 calculateTotalSpotLights() {

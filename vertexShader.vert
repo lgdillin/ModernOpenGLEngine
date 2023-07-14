@@ -13,16 +13,21 @@ out vec4 vertexColor;
 out vec2 texCoords;
 out vec3 normals;
 out vec3 fragmentPosition;
+out vec4 directionalLightSpacePos;
 
 uniform mat4 model;
 uniform mat4 projection;
 uniform mat4 view;
 uniform mat4 scaleMatrix;
+uniform mat4 directionalLightTransform;
 
 
 void main() {
 	gl_Position = projection * view * model * vec4(pos, 1.0);
-	//vertexColor = vec4(clamp(newColor, 0.0, 1.0), 1.0);
+
+	directionalLightSpacePos = directionalLightTransform 
+		* model * vec4(pos, 1.0);
+
 	vertexColor = vec4(newColor, 1.0);
 
 	vec4 temp = scaleMatrix * vec4(textureCoordinatesIn, 0.0, 1.0);
