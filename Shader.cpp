@@ -7,6 +7,7 @@ Shader::Shader() {
 	uniformView = 0;
 	pointLightCount = 0;
 	spotLightCount = 0;
+	uniformDirectionalLightTransform = 99;
 }
 
 Shader::~Shader() {
@@ -158,12 +159,31 @@ void Shader::setSpotLights(
 }
 
 void Shader::setTexture(GLuint textureUnit) {
+	glUniform1i(uniformTexture, textureUnit);
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "set shader texture " << error << std::endl;
+	}
 }
 
 void Shader::setDirectionalShadowMap(GLuint textureUnit) {
+	glUniform1i(uniformDirectionalShadowMap, textureUnit);
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "set directional shadow map " << error << std::endl;
+	}
 }
 
-void Shader::setDirectionalLightTransform(glm::mat4 *transform) {
+void Shader::setDirectionalLightTransform(glm::mat4 transform) {
+	glUniformMatrix4fv(uniformDirectionalLightTransform, 1, GL_FALSE,
+		glm::value_ptr(transform));
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "set directional light transform " << error << std::endl;
+	}
 }
 
 
@@ -173,6 +193,8 @@ void Shader::useShader() {
 	}
 
 	glUseProgram(shaderId);
+
+	//std::cout << "Using shader Program: " << shaderId << std::endl;
 }
 
 void Shader::clearShader() {
@@ -237,8 +259,14 @@ void Shader::compileShader(
 	// We want the id of the location of the uniform variable in the program
 	uniformModel = glGetUniformLocation(shaderId, "model");
 	uniformProjection = glGetUniformLocation(shaderId, "projection");
+
 	uniformView = glGetUniformLocation(shaderId, "view");
 	uniformScaleMatrix = glGetUniformLocation(shaderId, "scaleMatrix");
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Error binding matrix uniforms " << error << std::endl;
+	}
 
 	// Configuration the uniforms for the Directional Light
 	uniformDirectionalLight.uniformColor = glGetUniformLocation(shaderId, 
@@ -267,7 +295,7 @@ void Shader::compileShader(
 	uniformSpotLightCount = glGetUniformLocation(shaderId,
 		"spotLightCount");
 
-	GLenum error = glGetError();
+	error = glGetError();
 	if (error != GL_NO_ERROR) {
 		std::cout << "Error binding Uniform Values " << error << std::endl;
 	}
@@ -358,12 +386,17 @@ void Shader::compileShader(
 		std::cout << "Error binding uniform pointLight values " << error << std::endl;
 	}
 
-	uniformTexture = glGetUniformLocation(shaderId, "texture0");
+	uniformTexture = glGetUniformLocation(shaderId, "diffuseTexture");
 
 	uniformDirectionalLightTransform = glGetUniformLocation(shaderId, 
 		"directionalLightTransform");
 	uniformDirectionalShadowMap = glGetUniformLocation(shaderId, 
 		"directionalShadowMap");
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Error binding shadow map " << error << std::endl;
+	}
 }
 
 void Shader::addShader(

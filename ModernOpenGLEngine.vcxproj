@@ -148,6 +148,7 @@
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="SpotLight.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UtilityDebug.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicRenderPipeline.md" />
@@ -178,6 +179,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CameraAndUserInput.md" />
+    <None Include="shadowPass.frag" />
+    <None Include="shadowPass.vert" />
     <None Include="vDirectionalShadowMap.vert" />
     <None Include="fDirectionalShadowMap.frag" />
     <None Include="fragmentShaderColor.frag" />

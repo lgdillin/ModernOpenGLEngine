@@ -19,6 +19,11 @@ PointLight::~PointLight() {
 
 }
 
+void PointLight::setIntensity(GLfloat _dIntensity, GLfloat _aIntensity) {
+	diffuseIntensity = _dIntensity;
+	ambientIntensity = _aIntensity;
+}
+
 void PointLight::useLight(
 	GLuint ambientIntensityLocation,
 	GLuint colorLocation,

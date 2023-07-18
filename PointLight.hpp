@@ -7,14 +7,16 @@ public:
 	PointLight(
 		glm::vec3 _position = glm::vec3(0.0f, 0.0f, 0.0f),
 		glm::vec3 _color = glm::vec3(1.0f, 1.0f, 1.0f),
-		GLfloat dIntensity = 0.5f,
-		GLfloat aIntensity = 1.0f,
+		GLfloat dIntensity = 0.3f,
+		GLfloat aIntensity = 0.6f,
 		GLfloat _constant = 0.5f,
 		GLfloat _linear = 0.2f,
 		GLfloat _quadratic = 0.1f
 	);
 
 	~PointLight();
+
+	void setIntensity(GLfloat dIntensity, GLfloat aIntensity);
 
 	void useLight(
 		GLuint ambientIntensityLocation,

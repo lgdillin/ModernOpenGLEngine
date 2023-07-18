@@ -124,6 +124,10 @@ public:
 		return deltaY;
 	}
 
+	void resetViewport() {
+		glViewport(0, 0, bufferWidth, bufferHeight);
+	}
+
 
 	// Initialize our GLFW Window
 	int initialize() {

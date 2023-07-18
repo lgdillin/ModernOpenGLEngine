@@ -59,6 +59,11 @@ bool Texture::loadTextureAlphaOption(bool alphaMode) {
 	return true;
 }
 
+void Texture::useTextureDebug(GLuint id) {
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, textureId);
+}
+
 
 void Texture::useTexture() {
 	// GL_TEXTURE0 is what is called a texture unit
@@ -70,6 +75,11 @@ void Texture::useTexture() {
 	glActiveTexture(GL_TEXTURE0);
 	// binds textureId to GL_TEXTURE0
 	glBindTexture(GL_TEXTURE_2D, textureId);
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "error binding texture " << error << std::endl;
+	}
 }
 
 void Texture::clearTexture() {

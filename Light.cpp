@@ -3,16 +3,30 @@
 Light::Light(
 	glm::vec3 _color,
 	GLfloat aIntensity, 
-	GLfloat dIntensity
+	GLfloat dIntensity,
+	GLuint _shadowWidth,
+	GLuint _shadowHeight
 ) {
 	color = glm::vec3(_color.r, _color.g, _color.b);
 	ambientIntensity = aIntensity;
 
 	diffuseIntensity = dIntensity;
+
+	m_shadowWidth = _shadowWidth;
+	m_shadowHeight = _shadowHeight;
+
+	//m_shadowMap = new ShadowMap();
+	//m_shadowMap->init(_shadowWidth, _shadowHeight);
+	
 }
 
 Light::~Light() {
 
+}
+
+void Light::initShadowMap() {
+	m_shadowMap = new ShadowMap();
+	m_shadowMap->init(m_shadowWidth, m_shadowHeight);
 }
 
 //void Light::useLight(GLuint ambientIntensityLocation, GLuint colorLocation,

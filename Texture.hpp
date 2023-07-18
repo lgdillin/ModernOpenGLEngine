@@ -12,6 +12,7 @@ public:
 
 	bool loadTextureAlphaOption(bool alphaMode);
 	void useTexture();
+	void useTextureDebug(GLuint id);
 	void clearTexture();
 
 

@@ -33,7 +33,14 @@ class GlfwGame {
 private:
 	std::vector<Mesh*> meshes;
 	std::vector<Shader*> shaders;
-	std::vector<RectangularPrism*> prisms;
+	std::vector<RectangularPrism> prisms;
+
+	std::vector<RectangularPrism> prisms2;
+	//std::vector<PointLight> pointLights;
+	//std::vector<SpotLight> spotLights;
+
+	SpotLight spotLights[MAX_SPOT_LIGHTS];
+	PointLight pointLights[MAX_POINT_LIGHTS];
 
 	std::string vShader, fShader;
 
@@ -62,8 +69,7 @@ private:
 	Material shinyMaterial, dullMaterial, superShinyMaterial;
 
 	DirectionalLight directionalLight;
-	PointLight pointLights[MAX_POINT_LIGHTS];
-	SpotLight spotLights[MAX_SPOT_LIGHTS];
+	glm::mat4 lightTransform;
 
 	unsigned int pointLightCount;
 
@@ -71,17 +77,19 @@ private:
 
 	MeshGroup plant;
 
-	//MeshCollider MeshCollider;
+	Shader *directionalShadowShader, shadowPass;
 
-	//Assimp::Importer *importer;
+	float incrementArgument;
 
 public:
 	GlfwGame() {
 		meshes = std::vector<Mesh*>();
 		shaders = std::vector<Shader*>();
-		prisms = std::vector<RectangularPrism*>();
+		prisms = std::vector<RectangularPrism>();
+		//pointLights = std::vector<PointLight>();
+		//spotLights = std::vector<SpotLight>();
 
-		uniformModel = 0;
+		uniformModel = 99;
 		uniformProjection = 0;
 		uniformView = 0;
 
@@ -90,46 +98,11 @@ public:
 
 		glfwWindow = NULL;
 		//cameraBall = CameraBall();
+		
+		lightTransform = glm::mat4(1);
+		incrementArgument = 1.0f;
+
 	}
-
-	void foundCollisionAABB2(RectangularPrism *rp) {
-		glm::vec3 cameraPosition = cameraBall.getCamera()->getCameraPosition();
-
-		GLfloat x = glm::max(
-			rp->getXMinBound(), glm::min(cameraPosition.x, rp->getXMaxBound()));
-
-		GLfloat y = glm::max(
-			rp->getYMinBound(), glm::min(cameraPosition.y, rp->getYMaxBound()));
-
-		GLfloat z = glm::max(
-			rp->getZMinBound(), glm::min(cameraPosition.z, rp->getZMaxBound()));
-
-		GLfloat distanceY = glm::sqrt(
-			(x - cameraPosition.x) * (x - cameraPosition.x)
-			+ (y - cameraPosition.y) * (y - cameraPosition.y)
-			+ (z - cameraPosition.z) * (z - cameraPosition.z)
-		);
-
-		//std::cout << " x " << x << " - " << cameraPosition.x 
-		//	<< " = " << (x - cameraPosition.x) << std::endl;
-
-		//std::cout << " y " << y << " - " << cameraPosition.y
-		//	<< " = " << (y - cameraPosition.y) << std::endl;
-
-		//std::cout << " z " << x << " - " << cameraPosition.z
-		//	<< " = " << (z - cameraPosition.z) << std::endl;
-
-		glm::vec3 lastLegalPosition = glm::vec3(x, y, z);
-		if (distanceY < cameraBall.getEyeHeight()) {
-			glm::vec3 newPosition = cameraBall.getCamera()->getLastPosition();
-			cameraBall.getCamera()->setLastPosition(cameraPosition);
-			cameraBall.getCamera()
-				->setCurrentPosition(newPosition);
-		}
-	}
-
-
-
 
 	// Define a callback function
 	void DebugMessageCallback(GLenum source, GLenum type, GLuint id, 
@@ -144,8 +117,6 @@ public:
 	void init() {
 		glEnable(GL_DEBUG_OUTPUT);
 		//glDebugMessageCallback(DebugMessageCallback, nullptr);
-		// Initialize GLFW
-		//Assimp::Importer importer = Assimp::Importer();
 
 		glfwWindow = new GlfwWindow(800, 600);
 		glfwWindow->initialize();
@@ -153,39 +124,15 @@ public:
 		glfwCamera = GlfwCamera();
 		cameraBall = CameraBall(&glfwCamera);
 
-		GLfloat vertices[] = {
-			-1.0f, -1.0, 0.0f, // location
-			1.0f, 0.0f, 0.0f, // color 
-			0.0f, 0.0f, // texture
 
-			0.0f, -1.0f, 1.0f,
-			0.0f, 0.0f, 1.0f,
-			0.5f, 0.0f,
-
-			1.0f, -1.0f, 0.0f,
-			0.0f, 1.0f, 0.0f,
-			1.0f, 0.0f,
-
-			0.0f, 1.0f, 0.0f,
-			0.5f, 0.0f, 0.5f,
-			0.5f, 1.0f
-		};
-
-		// create a set of indices to tell the GPU which points
-		// to place in which order
-		unsigned int indices[] = {
-			0, 3, 1,
-			1, 3, 2,
-			2, 3, 0,
-			0, 1, 2
-		};
 
 		directionalLight = DirectionalLight(
-			glm::vec3(1.0f, 3.0f, 1.0f),
-			glm::vec3(1.0f, 1.0f, 1.0f),
+			glm::vec3(-20.0f, 25.0f, 8.0f),
+			glm::vec3(1.0f, 0.9f, 0.9f),
 			0.1f,
-			0.2f
+			0.3f
 		);
+		directionalLight.initShadowMap();
 
 		pointLights[0] = PointLight(
 			glm::vec3(8.0f, 0.5f, -0.5f),
@@ -196,32 +143,46 @@ public:
 			glm::vec3(0.5f, 1.0f, 0.0f)
 		);
 		pointLights[2] = PointLight(
-			glm::vec3(10.0f, 6.0f, 22.5f),
+			glm::vec3(10.0f, 5.0f, 22.5f),
 			glm::vec3(1.0f, 0.5f, 0.0f)
 		);
+		pointLights[2].setIntensity(0.4f, 0.7f);
 		
-		spotLights[0] = SpotLight(glm::vec3(0.0f, 10.0f, 0.0f));
-		spotLights[0].setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
-		spotLights[0].setEdge(20.0f);
-		spotLights[0].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
 
-		spotLights[1] = SpotLight(glm::vec3(12.0f, 4.0f, 5.0f));
-		spotLights[1].setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
-		spotLights[1].setConstantFactor(0.02f);
-		spotLights[1].setLinearFactor(0.006f);
-		spotLights[1].setEdge(30.0f);
-		spotLights[1].setColor(glm::vec3(1.0f, 0.0f, 1.0f));
+		for (auto &pl : pointLights) {
+			//pl.initShadowMap();
+		}
+		
+		SpotLight sp1 = SpotLight(glm::vec3(-3.0f, 10.0f, 0.0f));
+		sp1.setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
+		sp1.setEdge(20.0f);
+		sp1.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+		spotLights[0] = sp1;
 
-		spotLights[2] = SpotLight(glm::vec3(10.0f, 4.0f, 14.5f));
-		spotLights[2].setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
-		spotLights[2].setEdge(65.0f);
-		spotLights[2].setColor(glm::vec3(0.0f, 1.0f, 1.0f));
+		SpotLight sp2 = SpotLight(glm::vec3(12.0f, 4.0f, 5.0f));
+		sp2.setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
+		sp2.setConstantFactor(0.02f);
+		sp2.setLinearFactor(0.006f);
+		sp2.setEdge(30.0f);
+		sp2.setColor(glm::vec3(1.0f, 0.0f, 1.0f));
+		spotLights[1] = sp2;
+
+		SpotLight sp3 = SpotLight(glm::vec3(10.0f, 3.0f, 14.5f));
+		sp3.setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
+		sp3.setEdge(65.0f);
+		sp3.setColor(glm::vec3(0.0f, 1.0f, 1.0f));
+		spotLights[2] = sp3;
 
 		// Flashlight
-		spotLights[3] = SpotLight(glfwCamera.getCameraPosition());
-		spotLights[3].setDirection(glfwCamera.getCameraFront());
-		spotLights[3].setEdge(10.0f);
-		spotLights[3].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+		SpotLight sp4 = SpotLight(glfwCamera.getCameraPosition());
+		sp4.setDirection(glfwCamera.getCameraFront());
+		sp4.setEdge(10.0f);
+		sp4.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+		spotLights[3] = sp4;
+
+		for (auto &sl : spotLights) {
+			//sl.initShadowMap();
+		}
 
 
 		brickTexture = new Texture("resources/brick.png");
@@ -239,15 +200,20 @@ public:
 
 		std::string vShader = "./vertexShader.vert";
 		std::string fShader = "./fragmentShader.frag";
-		std::string fShader1 = "./fragmentShaderColor.frag";
+		
+		std::string vShader1 = "vDirectionalShadowMap.vert";
+		std::string fShader1 = "fDirectionalShadowMap.frag";
 
 		Shader *shader1 = new Shader();
 		shader1->createFromFile(vShader, fShader);
 		shaders.push_back(shader1);
 
 		Shader *shader2 = new Shader();
-		shader2->createFromFile(vShader, fShader1);
+		shader2->createFromFile(vShader1, fShader1);
 		shaders.push_back(shader2);
+		directionalShadowShader = shaders[1];
+
+		//shadowPass.createFromFile("shadowPass.vert", "shadowPass.frag");
 
 		shinyMaterial = Material(1.0f, 32);
 		//dullMaterial = Material(0.4f, 8);
@@ -259,7 +225,7 @@ public:
 		plant.load("resources/12221_Cat_v1_l3.obj");
 
 		// floor1
-		addNewBrush(
+		addNewBrushS(
 			"green",
 			grassTexture,
 			glm::vec3(0.0f, 0.0f, 0.0f),
@@ -268,7 +234,7 @@ public:
 			glm::vec3(10.0f, 10.0f, 1.0f));
 
 		// floor 2
-		addNewBrush(
+		addNewBrushS(
 			"green",
 			grassTexture,
 			glm::vec3(10.0f, 0.0f, 0.0f),
@@ -277,7 +243,7 @@ public:
 			glm::vec3(10.0f, 10.0f, 1.0f));
 
 		// floor 3
-		addNewBrush(
+		addNewBrushS(
 			"green",
 			grassTexture,
 			glm::vec3(10.0f, 0.0f, 10.0f),
@@ -286,7 +252,7 @@ public:
 			glm::vec3(10.0f, 10.0f, 1.0f));
 
 		// floor 4
-		addNewBrush(
+		addNewBrushS(
 			"green",
 			dirtTexture,
 			glm::vec3(10.0f, 0.0f, 22.5f),
@@ -295,7 +261,7 @@ public:
 			glm::vec3(15.0f, 15.0f, 1.0f));
 
 		// house ceiling
-		addNewBrush(
+		addNewBrushS(
 			"green",
 			rustTexture,
 			glm::vec3(10.0f, 9.0f, 22.5f),
@@ -304,7 +270,7 @@ public:
 			glm::vec3(15.0f, 15.0f, 1.0f));
 
 		// short right wall room 1
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(2.5f, 3.0f, 4.5f),
@@ -314,7 +280,7 @@ public:
 		);
 
 		// long left wall room 1
-		addNewBrush(
+		addNewBrushS(
 			"blue",
 			brickTexture,
 			glm::vec3(5.0f, 3.0f, -4.5f),
@@ -324,7 +290,7 @@ public:
 		);
 
 		// back wall room 1
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(-4.5f, 3.0f, 0.0),
@@ -334,7 +300,7 @@ public:
 		);
 
 		// far wall room 2
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(14.5f, 3.0f, 0.5f),
@@ -344,7 +310,7 @@ public:
 		);
 
 		// right wall room 3
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(5.5f, 3.0f, 10.0f),
@@ -354,7 +320,7 @@ public:
 		);
 
 		// left wall room 3
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(14.5f, 3.0f, 10.0f),
@@ -364,7 +330,7 @@ public:
 		);
 
 		// door partition
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(4.5f, 3.0f, 3.25f),
@@ -374,7 +340,7 @@ public:
 		);
 
 		// door partition
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(4.5f, 3.0f, -3.25f),
@@ -384,7 +350,7 @@ public:
 		);
 
 		// house left door partition
-		addNewBrush(
+		addNewBrushS(
 			"blue",
 			brickTexture,
 			glm::vec3(15.0f, 3.0f, 15.5f),
@@ -394,7 +360,7 @@ public:
 		);
 
 		// house right door partition
-		addNewBrush(
+		addNewBrushS(
 			"blue",
 			brickTexture,
 			glm::vec3(5.0f, 3.0f, 15.5f),
@@ -404,7 +370,7 @@ public:
 		);
 
 		// house door header
-		addNewBrush(
+		addNewBrushS(
 			"blue",
 			brickTexture,
 			glm::vec3(10.0f, 7.0f, 15.5f),
@@ -414,7 +380,7 @@ public:
 		);
 
 		// house back wall
-		addNewBrush(
+		addNewBrushS(
 			"blue",
 			brickTexture,
 			glm::vec3(10.0f, 4.5f, 29.5f),
@@ -424,7 +390,7 @@ public:
 		);
 
 		// house left wall
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(17.0f, 4.5f, 22.5f),
@@ -434,7 +400,7 @@ public:
 		);
 
 		// house right wall
-		addNewBrush(
+		addNewBrushS(
 			"red",
 			brickTexture,
 			glm::vec3(3.0f, 4.5f, 22.5f),
@@ -443,7 +409,7 @@ public:
 			glm::vec3(13.0f, 8.0f, 1.0f)
 		);
 
-		addNewBrush(
+		addNewBrushS(
 			"white",
 			boxTexture,
 			glm::vec3(0.0f, 3.0f, 0.0f),
@@ -454,7 +420,7 @@ public:
 
 
 
-		addNewBrush(
+		addNewBrushS(
 			"white",
 			plainTexture,
 			glm::vec3(10.0f, 3.0f, 22.5f),
@@ -462,10 +428,6 @@ public:
 			glm::vec3(0.0f, 1.0f, 0.0f),
 			glm::vec3(2.0f, 2.0f, 2.0f)
 		);
-
-	}
-
-	void findShortestPath() {
 
 	}
 
@@ -485,21 +447,285 @@ public:
 		rp->setRotationAngle(glm::radians(rotationAngle));
 		rp->setRotationVector(rotVector);
 		rp->setScalingVector(scale);
+		//prisms.push_back(rp);
+	}
+
+	void addNewBrushS(
+		std::string color,
+		Texture *texture,
+		glm::vec3 translation,
+		float rotationAngle,
+		glm::vec3 rotVector,
+		glm::vec3 scale
+	) {
+		RectangularPrism rp = RectangularPrism();
+		rp.initialize();
+		rp.pickColor(color);
+		rp.setTexture(texture);
+		rp.setTranslationVector(translation);
+		rp.setRotationAngle(glm::radians(rotationAngle));
+		rp.setRotationVector(rotVector);
+		rp.setScalingVector(scale);
 		prisms.push_back(rp);
 	}
 
+	void renderScene() {
+		glm::vec3 flashPos = glfwCamera.getCameraPosition();
+		flashPos.y = flashPos.y - 0.3f;
+		spotLights[3].setFlash(flashPos,
+			glfwCamera.getCameraFront());
+
+		////////////////////////////////////
+				// render/update loop
+		glUniform3f(uniformEyePosition,
+			glfwCamera.getCameraPosition().x,
+			glfwCamera.getCameraPosition().y,
+			glfwCamera.getCameraPosition().z);
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
+			glm::value_ptr(glfwWindow->getProjection()));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
+			glm::value_ptr(glfwCamera.calculateViewMatrix()));
+		int i = 0;
+		for (auto &prism : prisms) {
+			prism.transform();
+
+			// access uniform variables for shaders
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+				glm::value_ptr(prism.getModelMatrix()));
+
+
+			glUniformMatrix4fv(uniformScaleMatrix, 1, GL_FALSE,
+				glm::value_ptr(prism.scaleTexture()));
+
+			prism.getTexture()->useTexture();
+
+			if (i == 20) {
+				superShinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+			} else {
+				dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+			}
+			
+
+			prism.renderMesh();
+			++i;
+		}
+
+		glm::mat4 model1 = glm::mat4(1);
+		model1 = glm::translate(model1, glm::vec3(10.0f, 0.5f, 22.5f));
+		model1 = glm::rotate(model1, glm::radians(-90.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f));
+
+		incrementArgument += 0.05f;
+		model1 = glm::rotate(model1, glm::radians(incrementArgument), glm::vec3(0.0f, 0.0f, 1.0f));
+		model1 = glm::translate(model1, glm::vec3(-2.0f, 0.0f, 0.0f));
+
+		model1 = glm::scale(model1, glm::vec3(0.03f, 0.03f, 0.03f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+			glm::value_ptr(model1));
+
+		plant.render();
+	}
+
+	void directionalShadowMapPass() {
+		directionalLight.getShadowMap()->bindToFrameBuffer();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		shaders[1]->useShader();
+
+		uniformModel = shaders[1]->getModelLocation();
+		lightTransform = directionalLight.calculateLightTransform();
+		shaders[1]->setDirectionalLightTransform(
+			lightTransform);
+
+		for (auto &prism : prisms) {
+			prism.transform();
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+				glm::value_ptr(prism.getModelMatrix()));
+
+			prism.renderMesh();
+
+		}
+
+		glm::mat4 model1 = glm::mat4(1);
+		model1 = glm::translate(model1, glm::vec3(10.0f, 0.5f, 22.5f));
+		model1 = glm::rotate(model1, glm::radians(-90.0f),
+			glm::vec3(1.0f, 0.0f, 0.0f));
+
+		incrementArgument += 0.05f;
+		model1 = glm::rotate(model1, glm::radians(incrementArgument), glm::vec3(0.0f, 0.0f, 1.0f));
+		model1 = glm::translate(model1, glm::vec3(-2.0f, 0.0f, 0.0f));
+
+		model1 = glm::scale(model1, glm::vec3(0.03f, 0.03f, 0.03f));
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+			glm::value_ptr(model1));
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+	}
+
+	void renderPass() {
+
+
+		glfwWindow->resetViewport();
+		// Clear Window
+		// Used to wipe the frame to a "blank canvas"
+		// Otherwise we could end up with a lot of artifacts
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		// Specify we want to clear the color data in the buffer
+		// we can specify we want to clear the depth data
+		// Use the bitwise OR '|' to clear both color buffer bit
+		// and the depth buffer bit
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// Use the shader program
+		// This will grab the shader with this ID
+		// After we have created a shader, compiled it, checked it
+		// 
+		// In production, we would have a bunch of shaders,
+		// Draw what we need to with one shader, swap it out,
+		// Draw whatever we need with the next one, etc.
+		shaders[0]->useShader();
+		uniformModel = shaders[0]->getModelLocation();
+		uniformProjection = shaders[0]->getProjectionLocation();
+		uniformView = shaders[0]->getViewLocation();
+		uniformScaleMatrix = shaders[0]->getScaleMatrixLocation();
+		uniformEyePosition = shaders[0]->getEyePositionLocation();
+		uniformSpecularIntensity = shaders[0]->getSpecularIntensityLocation();
+		uniformShininess = shaders[0]->getShininessLocation();
+
+		// sets back to render viewport for the render pass
+
+
+		shaders[0]->setDirectionalLight(&directionalLight);
+		shaders[0]->setPointLights(pointLights, 3);
+		shaders[0]->setSpotLights(spotLights, 4);
+		
+		lightTransform = directionalLight.calculateLightTransform();
+		shaders[0]->setDirectionalLightTransform(
+			lightTransform);
+
+		directionalLight.getShadowMap()->read(GL_TEXTURE1);
+		shaders[0]->setTexture(0);
+		shaders[0]->setDirectionalShadowMap(1);
+
+		renderScene();
+	}
+
+
+	void testRenderPath() {
+		directionalLight.getShadowMap()->bindToFrameBuffer();
+		glClear(GL_DEPTH_BUFFER_BIT);
+		shaders[1]->useShader();
+
+		uniformModel = shaders[1]->getModelLocation();
+		lightTransform = directionalLight.calculateLightTransform();
+		shaders[1]->setDirectionalLightTransform(
+			lightTransform);
+
+		for (auto &prism : prisms2) {
+			prism.transform();
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+				glm::value_ptr(prism.getModelMatrix()));
+
+			prism.renderMesh();
+
+		}
+
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+		depthData();
+		//////////////////////////////////////////////////
+
+		glfwWindow->resetViewport();
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		shaders[0]->useShader();
+		uniformModel = shaders[0]->getModelLocation();
+		uniformProjection = shaders[0]->getProjectionLocation();
+		uniformView = shaders[0]->getViewLocation();
+		uniformScaleMatrix = shaders[0]->getScaleMatrixLocation();
+		uniformEyePosition = shaders[0]->getEyePositionLocation();
+		uniformSpecularIntensity = shaders[0]->getSpecularIntensityLocation();
+		uniformShininess = shaders[0]->getShininessLocation();
+		shaders[0]->setDirectionalLight(&directionalLight);
+		shaders[0]->setPointLights(pointLights, 3);
+		shaders[0]->setSpotLights(spotLights, 4);
+
+		lightTransform = directionalLight.calculateLightTransform();
+		shaders[0]->setDirectionalLightTransform(
+			lightTransform);
+
+		directionalLight.getShadowMap()->read(GL_TEXTURE1);
+		shaders[0]->setTexture(0);
+		shaders[0]->setDirectionalShadowMap(1);
+
+		glm::vec3 flashPos = glfwCamera.getCameraPosition();
+		flashPos.y = flashPos.y - 0.3f;
+		spotLights[3].setFlash(flashPos,
+			glfwCamera.getCameraFront());
+
+		//////////////////////////////////////////////////////////
+		glUniform3f(uniformEyePosition,
+			glfwCamera.getCameraPosition().x,
+			glfwCamera.getCameraPosition().y,
+			glfwCamera.getCameraPosition().z);
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
+			glm::value_ptr(glfwWindow->getProjection()));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
+			glm::value_ptr(glfwCamera.calculateViewMatrix()));
+
+		int i = 0;
+		for (auto& prism : prisms2) {
+			prism.transform();
+			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+				glm::value_ptr(prism.getModelMatrix()));
+			glUniformMatrix4fv(uniformScaleMatrix, 1, GL_FALSE,
+				glm::value_ptr(prism.scaleTexture()));
+			
+			prism.getTexture()->useTexture();
+
+			dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+			prism.renderMesh();
+
+			++i;
+		}
+	}
 
 	void runGame() {
-		bool directionToggle = true;
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_BACK);
+		glFrontFace(GL_CCW);
+		//glEnable(GL_DEPTH_TEST);
 
-		const float toRadians = 3.14159265f / 180.0f;
-		float triangleOffset = 0.0f;
-		float triangleMaximumOffset = 0.5f;
-		float triangleIncrementalValue = 0.0002f;
+		// Testing shadows
+		//addNewBrushS(
+		//	"white",
+		//	boxTexture,
+		//	glm::vec3(0.0f, 0.0f, 0.0f),
+		//	0.0f,
+		//	glm::vec3(0.0f, 1.0f, 0.0f),
+		//	glm::vec3(8.0f, 1.0f, 8.0f)
+		//);
 
-		float incrementArgument = 1.0f;
-		float sinArgument = 0.0f;
-		float sinColor = 0.0f;
+		//// Testing shadows
+		//addNewBrushS(
+		//	"white",
+		//	boxTexture,
+		//	glm::vec3(0.0f, 3.0f, 0.0f),
+		//	45.0f,
+		//	glm::vec3(1.0f, 0.0f, 1.0f),
+		//	glm::vec3(1.0f, 1.0f, 1.0f)
+		//);
+
+		//// Testing shadows
+		//addNewBrushS(
+		//	"white",
+		//	boxTexture,
+		//	glm::vec3(2.0f, 3.0f, 3.0f),
+		//	-45.0f,
+		//	glm::vec3(1.0f, 0.0f, 1.0f),
+		//	glm::vec3(1.0f, 5.0f, 1.0f)
+		//);
+
+		float sinArg = 0.25f;
 
 		while (!glfwWindow->getShouldClose()) {
 			GLfloat now = glfwGetTime(); // SDL_GetPerformanceCounter?
@@ -507,7 +733,6 @@ public:
 			lastTime = now;
 
 			// update collisions
-			//cameraBall.applyGravity();
 
 			// Get and handle user input events
 			glfwPollEvents();
@@ -523,151 +748,46 @@ public:
 				spotLights[3].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
 			}
 
-			if (directionToggle) {
-				triangleOffset += triangleIncrementalValue;
-			} else {
-				triangleOffset -= triangleIncrementalValue;
-			}
-
-			if (abs(triangleOffset) >= triangleMaximumOffset) {
-				directionToggle = !directionToggle;
-			}
-
-			// Clear Window
-			// Used to wipe the frame to a "blank canvas"
-			// Otherwise we could end up with a lot of artifacts
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			// Specify we want to clear the color data in the buffer
-			// we can specify we want to clear the depth data
-			// Use the bitwise OR '|' to clear both color buffer bit
-			// and the depth buffer bit
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			// Use the shader program
-			// This will grab the shader with this ID
-			// After we have created a shader, compiled it, checked it
-			// 
-			// In production, we would have a bunch of shaders,
-			// Draw what we need to with one shader, swap it out,
-			// Draw whatever we need with the next one, etc.
-			//glUseProgram(shader);
-			shaders[0]->useShader();
-			// glUniform1i(glGetUniformLocation(shaders[0]->getShaderId(),"texture0"), 0);
-			uniformModel = shaders[0]->getModelLocation();
-			uniformProjection = shaders[0]->getProjectionLocation();
-			uniformView = shaders[0]->getViewLocation();
-			uniformScaleMatrix = shaders[0]->getScaleMatrixLocation();
-			//uniformAmbientColor = shaders[0]->getColorLocation();
-			//uniformAmbientIntensity = shaders[0]->getAmbientIntensityLocation();
-			//uniformDiffuseIntensity = shaders[0]->getDiffuseIntensity();
-			//uniformDirection = shaders[0]->getDirectionLocation();
-			uniformEyePosition = shaders[0]->getEyePositionLocation();
-			uniformSpecularIntensity = shaders[0]->getSpecularIntensityLocation();
-			uniformShininess = shaders[0]->getShininessLocation();
-
-			//directionalLight.useLight(uniformAmbientIntensity, uniformAmbientColor, 
-			//	uniformDiffuseIntensity, uniformDirection);
-			//error = glGetError(); std::cout << error;
-			shaders[0]->setDirectionalLight(&directionalLight);
-			//error = glGetError(); std::cout << error;
-			shaders[0]->setPointLights(pointLights, 3);
-			//error = glGetError(); std::cout << error;
-			shaders[0]->setSpotLights(spotLights, 4);
-
-			glm::vec3 flashPos = glfwCamera.getCameraPosition();
-			flashPos.y = flashPos.y - 0.3f;
-			spotLights[3].setFlash(flashPos,
-				glfwCamera.getCameraFront());
-
-			sinArgument += 0.03f;
-			incrementArgument += 0.05f;
-			sinColor += .25f;
+			glm::vec3 dir = directionalLight.getDirection();
+			//dir.z += 0.007f * glm::sin(glm::radians(sinArg));
+			//std::cout << glm::sin(glm::radians(sinArg)) << std::endl;
+			directionalLight.setDirection(dir);
 
 
-			// render/update loop
-			glUniform3f(uniformEyePosition,
-				glfwCamera.getCameraPosition().x,
-				glfwCamera.getCameraPosition().y,
-				glfwCamera.getCameraPosition().z);
-			glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
-				glm::value_ptr(glfwWindow->getProjection()));
-			glUniformMatrix4fv(uniformView, 1, GL_FALSE,
-				glm::value_ptr(glfwCamera.calculateViewMatrix()));
-			int i = 0;
-			for (RectangularPrism* prism : prisms) {
-
-				if (i == 90) {
-					shaders[1]->useShader();
-					uniformModel = shaders[1]->getModelLocation();
-					uniformProjection = shaders[1]->getProjectionLocation();
-					uniformView = shaders[1]->getViewLocation();
-					uniformScaleMatrix = shaders[1]->getScaleMatrixLocation();
-					//uniformAmbientColor = shaders[1]->getColorLocation();
-					//uniformAmbientIntensity = shaders[1]->getAmbientIntensityLocation();
-					//uniformDiffuseIntensity = shaders[1]->getDiffuseIntensity();
-					//uniformDirection = shaders[1]->getDirectionLocation();
-					std::cout << "this should not execute";
-					//directionalLight.useLight(uniformAmbientIntensity, uniformAmbientColor,
-					//	uniformDiffuseIntensity, uniformDirection);
-					glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
-						glm::value_ptr(glfwWindow->getProjection()));
-					glUniformMatrix4fv(uniformView, 1, GL_FALSE,
-						glm::value_ptr(glfwCamera.calculateViewMatrix()));
-
-					prism->setRotationAngle(sinArgument * toRadians);
-					prism->getMesh()->mapBufferRangeVertexColorData();
-				}
-
-				prism->transform();
-				//foundCollisionAABB2(prism);
-
-				// access uniform variables for shaders
-				glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
-					glm::value_ptr(prism->getModelMatrix()));
-				glUniformMatrix4fv(uniformScaleMatrix, 1, GL_FALSE,
-					glm::value_ptr(prism->scaleTexture()));
-
-				//prism->printVertexData();
-
-				prism->getTexture()->useTexture();
-
-				if (i == 20) {
-					superShinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
-				} else {
-					dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
-				}
-				prism->renderMesh();
-				++i;
-			}
-
-			glm::mat4 model1 = glm::mat4(1);
-			model1 = glm::translate(model1, glm::vec3(10.0f, 0.5f, 22.5f));
-			//model1 = glm::translate(model1, glm::vec3(3.0f, 0.0f, 0.0f));
-			model1 = glm::rotate(model1, glm::radians(-90.0f),
-				glm::vec3(1.0f, 0.0f, 0.0f));
-
-			
-			model1 = glm::rotate(model1, glm::radians(incrementArgument), glm::vec3(0.0f, 0.0f, 1.0f));
-			model1 = glm::translate(model1, glm::vec3(-2.0f, 0.0f, 0.0f));
-
-			model1 = glm::scale(model1, glm::vec3(0.03f, 0.03f, 0.03f));
-			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
-				glm::value_ptr(model1));
-
-			plant.render();
-
-			cameraBall.getCamera()->setLastPosition(
-				cameraBall.getCamera()->getCameraPosition());
-
-			glUseProgram(0); // Unbinds the shader
+			directionalShadowMapPass();
+			renderPass();
+			//testRenderPath();
+			//glUseProgram(0); // Unbinds the shader
 
 			// OpenGL has two buffers/frames
 			// One the user sees, and the one that is being drawn
 			// We see the next frame by switching the address the pointer
 			// Is pointing to
 			glfwWindow->swapBuffers();
-
+			sinArg += 0.1f;
 
 		}
 	}
+
+	void depthData() {
+		int width = directionalLight.getShadowMap()->getShadowWidth();
+		int height = directionalLight.getShadowMap()->getShadowHeight();
+
+		GLfloat *depthData = new GLfloat[width * height];
+		glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT,
+			GL_FLOAT, depthData);
+
+		// Analyze the depth data to check for meaningful information
+		bool hasRealInformation = false;
+		for (int i = 0; i < width * height; ++i) {
+			// Check if any of the depth values are within a meaningful range
+			if (depthData[i] > 0.0 && depthData[i] < 1.0) {
+				hasRealInformation = true;
+				//std::cout << "has data at: " << i << " with " 
+				//	<< depthData[i] << std::endl;
+				//break;
+			}
+		}
+	}
 };
+

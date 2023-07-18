@@ -46,7 +46,7 @@ struct Material {
 uniform int pointLightCount;
 uniform int spotLightCount;
 
-uniform sampler2D texture0;
+uniform sampler2D diffuseTexture;
 uniform sampler2D directionalShadowMap;
 uniform Material material;
 
@@ -62,23 +62,56 @@ float calcDirectionalShadowFactor(DirectionalLight dLight) {
 	vec3 projectionCoords = directionalLightSpacePos.xyz 
 		/ directionalLightSpacePos.w;
 
-	// now -1 is being mapped to 0.0. (values now fall between [0,1])
 	projectionCoords = (projectionCoords * 0.5) + 0.5;
 
-	// seems to pick a value from the nearest plane
-	float nearestDepth = texture(directionalShadowMap, projectionCoords.xy).r;
+	// how far away the point is from the actual light
+	float currentDepth = projectionCoords.z;
+	// now -1 is being mapped to 0.0. (values now fall between [0,1])
 
 	// we now know where the light says the closest point is in that direction (xy)
 	// however its not necessarily the point we're looking at.
 	// the actual point we're looking at is the entire 
 
-	// how far away the point is from the actual light
-	float currentDepth = projectionCoords.z;
 
-	float shadow = currentDepth > nearestDepth ? 1.0 : 0.0;
+	vec3 normal = normalize(normals);
+	vec3 lDirection = normalize(directionalLight.direction);
+	float bias = max(0.005 * (1.0 - dot(normal, lDirection)), 0.0005);
+
+	float shadow = 0.0;
+	vec2 texelSize = 1.0 / textureSize(directionalShadowMap, 0);
+	for(int x = -1; x <= 1; ++x) {
+		for(int y = -1; y <= 1; ++y) {
+			float pcfDepth = texture(
+				directionalShadowMap,
+				projectionCoords.xy + vec2(x,y) * texelSize).r;
+
+			shadow += currentDepth - bias > pcfDepth ? 1.0 : 0.0;
+		}
+	}
+
+	// we iterated over 9 pixels, so we are dividing it by the number 
+	// of pixels to compute an average, and scale by that
+	shadow /= 9.0;
+
+	if(projectionCoords.z > 1.0) {
+		shadow = 0.0;
+	}	
 
 	return shadow;
 }
+
+
+float calcDirectionalShadowFactor1(DirectionalLight dLight) {
+	vec3 projCoords = directionalLightSpacePos.xyz / directionalLightSpacePos.w;
+
+	projCoords = (projCoords * 0.5) + 0.5;
+	float closest = texture(directionalShadowMap, projCoords.xy).r;
+	float current = projCoords.z;
+
+	float shadow = current > closest ? 1.0 : 0.0;
+	return shadow;
+}
+
 
 vec4 calculateLightUsingDirVec(
 	Light _basicLight, 
@@ -161,14 +194,15 @@ vec4 calculateLightUsingDirVec(
 		}
 	}
 
-	return (ambientColor + (1.0 - _shadowFactor ) 
+	return 
+		(ambientColor + (1.0 - _shadowFactor) 
 		* (diffuseColor + specularColor));
 }
 
 vec4 calculatePointLight(PointLight pLight) {
 	// Get the vector pointing from the pointlight to the fragment
 	// ie. getting the Direction of the fragment from the pointLight
-	vec3 direction =  fragmentPosition - pLight.position;
+	vec3 direction =  pLight.position - fragmentPosition;
 
 	float _distance = length(direction); // 'distance' is reserved
 	direction = normalize(direction);
@@ -248,7 +282,7 @@ void main() {
 		+ calculateTotalPointLights()
 		+ calculateTotalSpotLights();
 
-	color = texture(texture0, texCoords) * computedLightColor;
+	color = texture(diffuseTexture, texCoords) * computedLightColor;
 
 	// Texture, ambient, directional, pointLight
 

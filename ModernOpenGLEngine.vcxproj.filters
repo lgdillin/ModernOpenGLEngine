@@ -54,6 +54,9 @@
     <ClCompile Include="ShadowMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="UtilityDebug.cpp">
+      <Filter>Resource Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -166,11 +169,19 @@
     <None Include="ScalingAndClippingTextures.md">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="ShadowMapping.md" />
     <None Include="vDirectionalShadowMap.vert">
       <Filter>Resource Files</Filter>
     </None>
     <None Include="fDirectionalShadowMap.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="ShadowMapping.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shadowPass.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="shadowPass.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>
