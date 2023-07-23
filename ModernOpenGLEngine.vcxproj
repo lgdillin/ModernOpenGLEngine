@@ -142,6 +142,7 @@
     <ClCompile Include="Material.cpp" />
     <ClCompile Include="Mesh.cpp" />
     <ClCompile Include="MeshGroup.cpp" />
+    <ClCompile Include="OmniShadowMap.cpp" />
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="RectangularPrism.cpp" />
     <ClCompile Include="Shader.cpp" />
@@ -158,7 +159,6 @@
     <ClInclude Include="Entity.hpp" />
     <ClInclude Include="GlfwGame.hpp" />
     <ClInclude Include="GlfwWindow.hpp" />
-    <ClInclude Include="GlfwWindow1.hpp" />
     <ClInclude Include="Light.hpp" />
     <ClInclude Include="ManifoldPoints.hpp" />
     <ClInclude Include="Material.hpp" />
@@ -166,6 +166,7 @@
     <ClInclude Include="MeshCollider.hpp" />
     <ClInclude Include="MeshGroup.hpp" />
     <ClInclude Include="Object.hpp" />
+    <ClInclude Include="OmniShadowMap.hpp" />
     <ClInclude Include="PhysicsModel.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="PointLight.hpp" />
@@ -179,6 +180,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CameraAndUserInput.md" />
+    <None Include="OmnidirectionalShadowsCubeMapsGeomShader.md" />
+    <None Include="omniShadowMap.frag" />
+    <None Include="omniShadowMap.geom" />
+    <None Include="omniShadowMap.vert" />
     <None Include="shadowPass.frag" />
     <None Include="shadowPass.vert" />
     <None Include="vDirectionalShadowMap.vert" />

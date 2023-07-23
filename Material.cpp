@@ -19,15 +19,11 @@ void Material::useMaterial(
 	GLuint specularIntensityLocation, GLuint shininessLocation) {
 
 	glUniform1f(specularIntensityLocation, specularIntensity);
+	glUniform1f(shininessLocation, shininess);
+
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "Error in useMaterial specIntensity " << error << std::endl;
-	}
-	
-	glUniform1f(shininessLocation, shininess);
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Error in useMaterial shininess " << error << std::endl;
+		std::cout << "Material::useMaterial() error: " << error << std::endl;
 	}
 	
 }

@@ -57,6 +57,9 @@
     <ClCompile Include="UtilityDebug.cpp">
       <Filter>Resource Files</Filter>
     </ClCompile>
+    <ClCompile Include="OmniShadowMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -75,9 +78,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="GlfwGame.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GlfwWindow1.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Texture.hpp">
@@ -134,6 +134,9 @@
     <ClInclude Include="ShadowMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OmniShadowMap.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -182,6 +185,18 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="shadowPass.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="OmnidirectionalShadowsCubeMapsGeomShader.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="omniShadowMap.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="omniShadowMap.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="omniShadowMap.geom">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

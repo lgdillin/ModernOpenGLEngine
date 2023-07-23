@@ -9,7 +9,11 @@ SpotLight::SpotLight(
 	GLfloat _constant, 
 	GLfloat _linear, 
 	GLfloat _quadratic,
-	GLfloat _edge
+	GLfloat _edge,
+	GLfloat _shadowWidth,
+	GLfloat _shadowHeight,
+	GLfloat _nearPlane,
+	GLfloat _farPlane
 ) : PointLight(
 	_position, 
 	_color, 
@@ -17,7 +21,11 @@ SpotLight::SpotLight(
 	dIntensity,
 	_constant,
 	_linear,
-	_quadratic
+	_quadratic,
+	_shadowWidth,
+	_shadowHeight,
+	_nearPlane,
+	_farPlane
 ){
 	// directional vector
 	direction = _direction;

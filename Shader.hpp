@@ -22,7 +22,11 @@ public:
 	~Shader();
 
 	void createFromFile(std::string vFile, std::string fFile);
+	void createFromFile(std::string vFile, std::string gFile, std::string fFile);
+
 	void createFromString(std::string vertexCode, std::string fragmentCode);
+
+	void validate();
 
 	GLuint getModelLocation();
 	GLuint getProjectionLocation();
@@ -35,15 +39,23 @@ public:
 	GLuint getSpecularIntensityLocation();
 	GLuint getShininessLocation();
 	GLuint getEyePositionLocation();
+	GLuint getOmniLightPositionLocation();
+	GLuint getFarPlaneLocation();
 
 	GLuint getShaderId() { return shaderId; }
 
 	void setDirectionalLight(DirectionalLight *dLight);
-	void setPointLights(PointLight *pointLight, unsigned int lightCount);
-	void setSpotLights(SpotLight *spotLight, unsigned int lightCount);
+	void setPointLights(PointLight *pointLight, unsigned int lightCount,
+		unsigned int textureUnit, unsigned int offset);
+	
+	void setSpotLights(SpotLight *spotLight, unsigned int lightCount,
+		unsigned int textureUnit, unsigned int offset);
+
+
 	void setTexture(GLuint textureUnit);
 	void setDirectionalShadowMap(GLuint textureUnit);
 	void setDirectionalLightTransform(glm::mat4 transform);
+	void setLightMatrices(std::vector<glm::mat4> lightMatrices);
 
 	void useShader();
 	void clearShader();
@@ -82,11 +94,24 @@ private:
 		GLuint uniformEdge;
 	} uniformSpotLight[MAX_SPOT_LIGHTS];
 
+	struct {
+		GLuint shadowMap;
+		GLuint farPlane;
+	} uniformOmniShadowMap[MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS];
+
 	// compiles a shader from a string literal or from a read file
 	void compileShader(
 		std::string vertexCode, 
 		std::string fragmentCode
 	);
+
+	void compileShader(
+		std::string vertexCode,
+		std::string geometryCode,
+		std::string fragmentCode
+	);
+
+	void compileProgram();
 
 	void addShader(
 		GLuint programId, 
@@ -113,6 +138,9 @@ private:
 		uniformSpotLightCount,
 		uniformDirectionalLightTransform,
 		uniformDirectionalShadowMap,
-		uniformTexture;
+		uniformTexture,
+		uniformOmniLightPosition,
+		uniformFarPlane,
+		uniformLightMatrices[6];
 
 };

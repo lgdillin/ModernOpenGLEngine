@@ -72,7 +72,7 @@ void Texture::useTexture() {
 	// texture, but will be accessing it through our unit.
 	// There is a required minimum number of 16 texture units for a 
 	// modern GPU, but many GPUs have more
-	glActiveTexture(GL_TEXTURE0);
+	glActiveTexture(GL_TEXTURE1);
 	// binds textureId to GL_TEXTURE0
 	glBindTexture(GL_TEXTURE_2D, textureId);
 

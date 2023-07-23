@@ -49,11 +49,76 @@ void Shader::createFromFile(std::string vFile, std::string fFile) {
 	compileShader(vFileContents, fFileContents);
 }
 
+void Shader::createFromFile(std::string vFile, std::string gFile, 
+	std::string fFile
+) {
+	// Read the vertex shader file
+	std::ifstream fileStream(vFile, std::ios::in);
+	if (!fileStream.is_open()) {
+		std::cout << "File: " << vFile << " does not exist" << std::endl;
+		throw;
+	}
+
+	std::string vFileContents = "";
+	std::string line = "";
+	while (!fileStream.eof()) {
+		std::getline(fileStream, line);
+		vFileContents.append(line + "\n");
+	}
+	fileStream.close();
+
+	// Read the Geometry shader file
+	fileStream = std::ifstream(gFile, std::ios::in);
+	if (!fileStream.is_open()) {
+		std::cout << "File: " << gFile << " does not exist" << std::endl;
+		throw;
+	}
+
+	std::string gFileContents = "";
+	line = "";
+	while (!fileStream.eof()) {
+		std::getline(fileStream, line);
+		gFileContents.append(line + "\n");
+	}
+	fileStream.close();
+
+	// Read Fragment Shader
+	fileStream = std::ifstream(fFile, std::ios::in);
+	if (!fileStream.is_open()) {
+		throw ("File: " + fFile + " does not exist");
+	}
+
+	std::string fFileContents = "";
+	line = "";
+	while (!fileStream.eof()) {
+		std::getline(fileStream, line);
+		fFileContents.append(line + "\n");
+	}
+	fileStream.close();
+
+	compileShader(vFileContents, gFileContents, fFileContents);
+}
+
 void Shader::createFromString(
 	std::string vertexCode, 
 	std::string fragmentCode
 ) {
 	compileShader(vertexCode, fragmentCode);
+}
+
+void Shader::validate() {
+	// Get the error codes from the creation of the shaders
+	GLint result = 0;
+	GLchar errorLog[1024] = { 0 };
+
+	// Checking for us if the shader we created is valid
+	glValidateProgram(shaderId);
+	glGetProgramiv(shaderId, GL_VALIDATE_STATUS, &result);
+	if (!result) {
+		glGetProgramInfoLog(shaderId, sizeof(errorLog), NULL, errorLog);
+		std::cout << "Shader::validate() error: " << errorLog << std::endl;
+		return;
+	}
 }
 
 GLuint Shader::getModelLocation() {
@@ -97,6 +162,14 @@ GLuint Shader::getEyePositionLocation() {
 	return uniformEyePosition;
 }
 
+GLuint Shader::getOmniLightPositionLocation() {
+	return uniformOmniLightPosition;
+}
+
+GLuint Shader::getFarPlaneLocation() {
+	return uniformFarPlane;
+}
+
 // Not used
 GLuint Shader::getScaleMatrixLocation() {
 	return uniformScaleMatrix;
@@ -112,7 +185,9 @@ void Shader::setDirectionalLight(DirectionalLight *dLight) {
 
 void Shader::setPointLights(
 	PointLight *pointLight,
-	unsigned int lightCount
+	unsigned int lightCount,
+	unsigned int textureUnit,
+	unsigned int offset
 ) {
 	if (lightCount > MAX_POINT_LIGHTS) {
 		lightCount = MAX_POINT_LIGHTS;
@@ -130,12 +205,27 @@ void Shader::setPointLights(
 			uniformPointLight[i].uniformLinear,
 			uniformPointLight[i].uniformQuadratic
 		);
+
+		pointLight[i].getShadowMap()->read(GL_TEXTURE0 + textureUnit + i);
+		glUniform1i(uniformOmniShadowMap[i + offset].shadowMap, 
+			textureUnit + i);
+
+		glUniform1f(uniformOmniShadowMap[i + offset].farPlane,
+			pointLight[i].getFarPlane());
+	}
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Shader::setPointLights() error "
+			<< error << std::endl;
 	}
 }
 
 void Shader::setSpotLights(
 	SpotLight *spotLight, 
-	unsigned int lightCount
+	unsigned int lightCount,
+	unsigned int textureUnit,
+	unsigned int offset
 ) {
 	if (lightCount > MAX_SPOT_LIGHTS) {
 		lightCount = MAX_SPOT_LIGHTS;
@@ -155,6 +245,19 @@ void Shader::setSpotLights(
 			uniformSpotLight[i].uniformQuadratic,
 			uniformSpotLight[i].uniformEdge
 		);
+
+		spotLight[i].getShadowMap()->read(GL_TEXTURE0 + textureUnit + i);
+		glUniform1i(uniformOmniShadowMap[i + offset].shadowMap,
+			textureUnit + i);
+
+		glUniform1f(uniformOmniShadowMap[i + offset].farPlane,
+			spotLight[i].getFarPlane());
+	}
+
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Shader::setSpotLights() error "
+			<< error << std::endl;
 	}
 }
 
@@ -163,7 +266,8 @@ void Shader::setTexture(GLuint textureUnit) {
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "set shader texture " << error << std::endl;
+		std::cout << "setTexture(GLuint textureUnit) error in Shader: " 
+			<< error << std::endl;
 	}
 }
 
@@ -172,7 +276,8 @@ void Shader::setDirectionalShadowMap(GLuint textureUnit) {
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "set directional shadow map " << error << std::endl;
+		std::cout << "Shader::setDirectionalShadowMap(GLuint textureUnit) error: " 
+			<< error << std::endl;
 	}
 }
 
@@ -182,19 +287,25 @@ void Shader::setDirectionalLightTransform(glm::mat4 transform) {
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "set directional light transform " << error << std::endl;
+		std::cout << "Shader::setDirectionalLightTransform() error: " 
+			<< error << std::endl;
+	}
+}
+
+void Shader::setLightMatrices(std::vector<glm::mat4> lightMatrices) {
+	for (int i = 0; i < 6; ++i) {
+		glUniformMatrix4fv(uniformLightMatrices[i], 1, GL_FALSE,
+			glm::value_ptr(lightMatrices[i]));
 	}
 }
 
 
 void Shader::useShader() {
 	if (!shaderId) {
-		throw "No shader present to use";
+		throw "Shader::useShader(): No shader present to use";
 	}
 
 	glUseProgram(shaderId);
-
-	//std::cout << "Using shader Program: " << shaderId << std::endl;
 }
 
 void Shader::clearShader() {
@@ -224,6 +335,28 @@ void Shader::compileShader(
 	addShader(shaderId, vertexCode, GL_VERTEX_SHADER);
 	addShader(shaderId, fragmentCode, GL_FRAGMENT_SHADER);
 
+	compileProgram();
+}
+
+void Shader::compileShader(std::string vertexCode, std::string geometryCode, std::string fragmentCode) {
+	// Creates the Program Object and returns a reference ID
+	shaderId = glCreateProgram();
+
+	// Make sure the shader was created correctly
+	if (!shaderId) {
+		std::cout << "Error creating shader" << std::endl;
+		return;
+	}
+
+	// add the shaders we made to the program
+	addShader(shaderId, vertexCode, GL_VERTEX_SHADER);
+	addShader(shaderId, geometryCode, GL_GEOMETRY_SHADER);
+	addShader(shaderId, fragmentCode, GL_FRAGMENT_SHADER);
+
+	compileProgram();
+}
+
+void Shader::compileProgram() {
 	// Get the error codes from the creation of the shaders
 	GLint result = 0;
 	GLchar errorLog[1024] = { 0 };
@@ -245,14 +378,7 @@ void Shader::compileShader(
 		return;
 	}
 
-	// Checking for us if the shader we created is valid
-	glValidateProgram(shaderId);
-	glGetProgramiv(shaderId, GL_VALIDATE_STATUS, &result);
-	if (!result) {
-		glGetProgramInfoLog(shaderId, sizeof(errorLog), NULL, errorLog);
-		std::cout << "Error validating shader program " << errorLog << std::endl;
-		return;
-	}
+	//validate();
 
 	// 1. shader program itself
 	// 2. search the program for the xMovement uniform variable
@@ -269,17 +395,23 @@ void Shader::compileShader(
 	}
 
 	// Configuration the uniforms for the Directional Light
-	uniformDirectionalLight.uniformColor = glGetUniformLocation(shaderId, 
+	uniformDirectionalLight.uniformColor = glGetUniformLocation(shaderId,
 		"directionalLight.basicLight.color");
 
-	uniformDirectionalLight.uniformAmbientIntensity = glGetUniformLocation(shaderId, 
+	uniformDirectionalLight.uniformAmbientIntensity = glGetUniformLocation(shaderId,
 		"directionalLight.basicLight.ambientIntensity");
 
-	uniformDirectionalLight.uniformDirection = glGetUniformLocation(shaderId, 
+	uniformDirectionalLight.uniformDirection = glGetUniformLocation(shaderId,
 		"directionalLight.direction");
 
-	uniformDirectionalLight.uniformDiffuseIntensity = glGetUniformLocation(shaderId, 
+	uniformDirectionalLight.uniformDiffuseIntensity = glGetUniformLocation(shaderId,
 		"directionalLight.basicLight.diffuseIntensity");
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Shader::CompileProgram() binding directional light " 
+			<< error << std::endl;
+	}
 
 	//uniformColor = glGetUniformLocation(shader, "newColor");
 	uniformSpecularIntensity = glGetUniformLocation(shaderId,
@@ -289,7 +421,7 @@ void Shader::compileShader(
 	uniformEyePosition = glGetUniformLocation(shaderId,
 		"eyePosition");
 
-	uniformPointLightCount = glGetUniformLocation(shaderId, 
+	uniformPointLightCount = glGetUniformLocation(shaderId,
 		"pointLightCount");
 
 	uniformSpotLightCount = glGetUniformLocation(shaderId,
@@ -297,7 +429,7 @@ void Shader::compileShader(
 
 	error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "Error binding Uniform Values " << error << std::endl;
+		std::cout << "Shader::CompileProgram() binding light counts " << error << std::endl;
 	}
 
 	// For the point lights
@@ -312,11 +444,11 @@ void Shader::compileShader(
 
 		snprintf(locationBuffer, sizeof(locationBuffer),
 			"pointLights[%d].basicLight.ambientIntensity", i);
-		uniformPointLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderId,locationBuffer);
+		uniformPointLight[i].uniformAmbientIntensity = glGetUniformLocation(shaderId, locationBuffer);
 
 		snprintf(locationBuffer, sizeof(locationBuffer),
 			"pointLights[%d].basicLight.diffuseIntensity", i);
-		uniformPointLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderId,locationBuffer);
+		uniformPointLight[i].uniformDiffuseIntensity = glGetUniformLocation(shaderId, locationBuffer);
 
 		snprintf(locationBuffer, sizeof(locationBuffer),
 			"pointLights[%d].position", i);
@@ -337,7 +469,7 @@ void Shader::compileShader(
 
 	error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "Error binding uniform pointLight values " << error << std::endl;
+		std::cout << "Shader::CompileProgram() binding pointLight attr. " << error << std::endl;
 	}
 
 	// For the spot lights
@@ -371,7 +503,7 @@ void Shader::compileShader(
 		snprintf(locationBuffer, sizeof(locationBuffer),
 			"spotLights[%d].basePointLight.quadratic", i);
 		uniformSpotLight[i].uniformQuadratic = glGetUniformLocation(shaderId, locationBuffer);
-	
+
 		snprintf(locationBuffer, sizeof(locationBuffer),
 			"spotLights[%d].direction", i);
 		uniformSpotLight[i].uniformDirection = glGetUniformLocation(shaderId, locationBuffer);
@@ -383,19 +515,64 @@ void Shader::compileShader(
 
 	error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "Error binding uniform pointLight values " << error << std::endl;
+		std::cout << "Shader::CompileProgram() binding spotLight attr. " << error << std::endl;
 	}
 
 	uniformTexture = glGetUniformLocation(shaderId, "diffuseTexture");
 
-	uniformDirectionalLightTransform = glGetUniformLocation(shaderId, 
+	uniformDirectionalLightTransform = glGetUniformLocation(shaderId,
 		"directionalLightTransform");
-	uniformDirectionalShadowMap = glGetUniformLocation(shaderId, 
+	uniformDirectionalShadowMap = glGetUniformLocation(shaderId,
 		"directionalShadowMap");
 
 	error = glGetError();
 	if (error != GL_NO_ERROR) {
 		std::cout << "Error binding shadow map " << error << std::endl;
+	}
+
+	uniformOmniLightPosition = glGetUniformLocation(shaderId,
+		"lightPosition");
+	uniformFarPlane = glGetUniformLocation(shaderId,
+		"farPlane");
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Error binding shadow map " << error << std::endl;
+	}
+
+	for (int i = 0; i < 6; ++i) {
+		char locationBuffer[99] = { '\0' };
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"lightMatrices[%d]", i);
+		uniformLightMatrices[i] = glGetUniformLocation(shaderId,
+			locationBuffer);
+	}
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Shader::CompileProgram() at binding lightMatrices[] " 
+			<< error << std::endl;
+	}
+
+	for (int i = 0; i < MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS; ++i) {
+		char locationBuffer[99] = { '\0' };
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"omniShadowMaps[%d].shadowMap", i);
+		uniformOmniShadowMap[i].shadowMap = glGetUniformLocation(shaderId,
+			locationBuffer);
+
+		snprintf(locationBuffer, sizeof(locationBuffer),
+			"omniShadowMaps[%d].farPlane", i);
+		uniformOmniShadowMap[i].farPlane = glGetUniformLocation(shaderId,
+			locationBuffer);
+	}
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Shader::CompileProgram() at binding uniformOmniShadowMap[] "
+			<< error << std::endl;
 	}
 }
 

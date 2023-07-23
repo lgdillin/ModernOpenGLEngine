@@ -204,7 +204,7 @@ public:
 		glfwSetWindowUserPointer(window, this);
 
 		projection = glm::perspective(
-			45.0f,
+			glm::radians(60.0f),
 			(GLfloat)(bufferWidth / bufferHeight),
 			0.1f,
 			100.0f);

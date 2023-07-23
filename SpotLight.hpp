@@ -17,7 +17,11 @@ public:
 		GLfloat _constant = 0.01f,
 		GLfloat _linear = 0.05f,
 		GLfloat _quadratic = 0.005f,
-		GLfloat _edge = 1.3f
+		GLfloat _edge = 1.3f,
+		GLfloat _shadowWidth = 1024.0f,
+		GLfloat _shadowHeight = 1024.0f,
+		GLfloat _nearPlane = 0.1f,
+		GLfloat _farPlane = 100.0f
 	);
 
 	~SpotLight();

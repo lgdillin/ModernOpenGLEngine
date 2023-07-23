@@ -34,7 +34,7 @@ bool ShadowMap::init(unsigned int _width, unsigned int _height) {
 	// will be set at 0.5.  
 	// Right now we are not passing a data array, we want an initialized buffer
 	// because we have no image (will be created with FBO)
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32F, m_width, m_height,
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, m_width, m_height,
 		0, GL_DEPTH_COMPONENT, GL_FLOAT, nullptr);
 	
 	// Manage the scaling of the texture's look when very close/far
@@ -51,36 +51,51 @@ bool ShadowMap::init(unsigned int _width, unsigned int _height) {
 
 	// Bind as a GL_FRAMEBUFFER
 	// THere are also GL_DRAW_FRAMEBUFFER, GL_READ_FRAMEBUFFER
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObject);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferObject);
 
 	// So this is the thing that will connect our framebuffer to our texture
 	// so when our FB is updated, when it gets rendered to, it will get rendered
 	// to the texture we pass to it
 	// GL_DEPTH_ATTACHMENT: use the depth values when its writing to our texture
-	glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 		GL_TEXTURE_2D, m_shadowMap, 0);
 
 	glDrawBuffer(GL_NONE); // we don't draw on the first pass
 	glReadBuffer(GL_NONE);
 
-	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+	GLenum status = glCheckNamedFramebufferStatus(m_frameBufferObject, GL_FRAMEBUFFER);
 	if (status != GL_FRAMEBUFFER_COMPLETE) {
-		std::cout << "Framebuffer error: " << status << std::endl;
+		std::cout << "Framebuffer error in ShadowMap::init(): " << status << std::endl;
 	}
 
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	return true;
 }
 
 void ShadowMap::bindToFrameBuffer() {
-	glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_frameBufferObject);
-	glViewport(0, 0, m_width, m_height);
 
+	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferObject);
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "bind to frame buffer " << error << std::endl;
+		std::cout << "OmniShadowMap::bindToFrameBuffer() error "
+			<< error << " can't bind to framebuffer: "
+			<< m_frameBufferObject << std::endl;
+	}
+
+
+	glViewport(0, 0, m_width, m_height);
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "OmniShadowMap::bindToFrameBuffer() error "
+			<< error << " can't resize viewport: " << std::endl;
+	}
+
+	GLenum framebufferStatus = glCheckNamedFramebufferStatus(m_frameBufferObject, GL_FRAMEBUFFER);
+	if (framebufferStatus != GL_FRAMEBUFFER_COMPLETE) {
+		std::cout << "ShadowMap::bindToFrameBuffer() bad status with code"
+			<< framebufferStatus << std::endl;
 	}
 }
 
@@ -93,6 +108,7 @@ void ShadowMap::read(GLenum textureUnit) {
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "bind texture to shadowmap " << error << std::endl;
+		std::cout << "read(GLenum textureUnit) error in ShadowMap: " 
+			<< error << std::endl;
 	}
 }
