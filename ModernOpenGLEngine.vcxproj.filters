@@ -60,6 +60,15 @@
     <ClCompile Include="OmniShadowMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -137,6 +146,12 @@
     <ClInclude Include="OmniShadowMap.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Sprite.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -197,6 +212,15 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="omniShadowMap.geom">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="Skybox.md">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="skyboxShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="skyboxShader.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

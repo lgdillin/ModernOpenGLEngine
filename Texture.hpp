@@ -2,7 +2,7 @@
 
 #include <iostream>
 #include <GL/glew.h>
-#include "stb_image.h"
+#include "stb_image.cpp"
 
 class Texture {
 public:
@@ -16,7 +16,7 @@ public:
 	void clearTexture();
 
 
-private:
+protected:
 	int width, height, bitDepth;
 	
 	GLuint textureId;

@@ -147,7 +147,10 @@
     <ClCompile Include="RectangularPrism.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="SpotLight.cpp" />
+    <ClCompile Include="Sprite.cpp" />
+    <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UtilityDebug.cpp" />
   </ItemGroup>
@@ -175,7 +178,9 @@
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="ShadowMap.hpp" />
     <ClInclude Include="Simplex.hpp" />
+    <ClInclude Include="Skybox.hpp" />
     <ClInclude Include="SpotLight.hpp" />
+    <ClInclude Include="Sprite.hpp" />
     <ClInclude Include="Texture.hpp" />
   </ItemGroup>
   <ItemGroup>
@@ -186,6 +191,9 @@
     <None Include="omniShadowMap.vert" />
     <None Include="shadowPass.frag" />
     <None Include="shadowPass.vert" />
+    <None Include="Skybox.md" />
+    <None Include="skyboxShader.frag" />
+    <None Include="skyboxShader.vert" />
     <None Include="vDirectionalShadowMap.vert" />
     <None Include="fDirectionalShadowMap.frag" />
     <None Include="fragmentShaderColor.frag" />

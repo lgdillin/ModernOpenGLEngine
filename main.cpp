@@ -267,7 +267,6 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 //#define STBI_NO_SIMD
 #define STB_IMAGE_IMPLEMENTATION
 
-
 #include <iostream>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -297,3 +296,22 @@ int main(int argc, char* argv[]) {
 	
 	return 0;
 }
+
+/*
+= Objectives Learned
+	- how to create and manipulate windows
+	- how to draw meshes/models
+	- how to use shaders
+	- how to use uniform variables
+	- how to use GLM to transform models
+	- how to use indexed draws
+	- how to use projections
+	- how to create and control a camera
+	- how to map textures 
+	- how to use the phong lighting model
+	- how to implement directional, point, and spot lights
+	- how to import models
+	- how to create and use shadow maps
+	- how to implement a skybox
+
+*/

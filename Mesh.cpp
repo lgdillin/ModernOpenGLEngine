@@ -32,7 +32,7 @@ void Mesh::createMesh(
 	// Sometimes the VAO doesn't generate?
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "Error in createMesh() " << error << std::endl;
+		std::cout << "Mesh::createMesh() " << error << std::endl;
 	}
 
 
@@ -77,17 +77,37 @@ void Mesh::createMesh(
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
 		11 * sizeof(GLfloat), (GLvoid*)0);
 
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Mesh::createMesh() " << error << " When getting vertexAttribPointer" << std::endl;
+	}
+
 	// define the layout of the (r,g,b) portion of the vertex attribute data
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE,
 		11 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Mesh::createMesh() " << error << " When getting vertexAttribPointer" << std::endl;
+	}
 
 	// define the layout of the (s,t) texture portion of the vertex attribute data
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE,
 		11 * sizeof(GLfloat), (GLvoid*)(6 * sizeof(GLfloat)));
 
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Mesh::createMesh() " << error << " When getting vertexAttribPointer" << std::endl;
+	}
+
 	// attribute pointer for the normals (nx,ny,nz)
 	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE,
 		11 * sizeof(GLfloat), (GLvoid*)(8 * sizeof(GLfloat)));
+
+	error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << "Mesh::createMesh() " << error << " When getting vertexAttribPointer" << std::endl;
+	}
 
 	// we want to enable that location=0 in the VS
 	glEnableVertexAttribArray(0);

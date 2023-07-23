@@ -62,21 +62,44 @@ uniform SpotLight spotLights[MAX_SPOT_LIGHTS];
 
 uniform vec3 eyePosition;
 
+vec3 gridSamplingDisk[20] = vec3[]
+(
+   vec3(1, 1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1, 1,  1), 
+   vec3(1, 1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1, 1, -1),
+   vec3(1, 1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1, 1,  0),
+   vec3(1, 0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1, 0, -1),
+   vec3(0, 1,  1), vec3( 0, -1,  1), vec3( 0, -1, -1), vec3( 0, 1, -1)
+);
+
 float calcOmniShadowFactor(PointLight light, int shadowIndex) {
 	// we want to know what the distance between our light source and that frag 
 	// so we can then compare it to the closest position 
 	vec3 fragToLight = fragmentPosition - light.position;
-	
-	// so if our fragToLight is equal to closest  then it is in the light
-	float closest = texture(omniShadowMaps[shadowIndex].shadowMap, fragToLight).r;
-	closest *= omniShadowMaps[shadowIndex].farPlane;
-	
+
 	// if current has a larger value than closest, then it is in the shadow 
-	float current = length(fragToLight);
+	float currentDepth = length(fragToLight);
 
+	float shadow = 0.0;
 	float bias = 0.05;
-	float shadow = current - bias > closest ? 1.0 : 0.0;
+	float samples = 4.0;
+	float offset = 0.1;
 
+	float viewDistance = length(eyePosition - fragmentPosition);
+	float diskRadius = (1.0 + (viewDistance 
+		/ omniShadowMaps[shadowIndex].farPlane)) / 25.0;
+	
+	for(int i = 0; i < samples; ++i)
+	{
+		float closestDepth = texture(omniShadowMaps[shadowIndex].shadowMap, 
+			fragToLight + gridSamplingDisk[i] * diskRadius).r;
+
+		closestDepth *= omniShadowMaps[shadowIndex].farPlane;   // Undo mapping [0;1]
+		
+		if(currentDepth - bias > closestDepth)
+			shadow += 1.0;
+	}
+	shadow /= float(samples);  
+	
 	return shadow;
 }
 

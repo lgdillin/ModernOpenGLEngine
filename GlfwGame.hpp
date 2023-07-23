@@ -27,6 +27,7 @@
 #include "CameraBall.hpp"
 #include "SpotLight.hpp"
 #include "MeshGroup.hpp"
+#include "Skybox.hpp"
 //#include "MeshCollider.hpp"
 
 class GlfwGame {
@@ -36,6 +37,7 @@ private:
 	std::vector<RectangularPrism> prisms;
 
 	std::vector<RectangularPrism> prisms2;
+	std::vector < std::string> skyboxFaces;
 	//std::vector<PointLight> pointLights;
 	//std::vector<SpotLight> spotLights;
 
@@ -79,6 +81,7 @@ private:
 
 	GLenum error;
 
+	Skybox skybox;
 	MeshGroup plant;
 
 	Shader *directionalShadowShader, shadowPass;
@@ -128,10 +131,17 @@ public:
 		glfwCamera = GlfwCamera();
 		cameraBall = CameraBall(&glfwCamera);
 
+		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_rt.tga");
+		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_lf.tga");
+		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_up.tga");
+		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_dn.tga");
+		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_bk.tga");
+		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_ft.tga");
+		skybox = Skybox(skyboxFaces);
 
 
 		directionalLight = DirectionalLight(
-			glm::vec3(-20.0f, 25.0f, 8.0f),
+			glm::vec3(5.0f, 28.0f, 25.0f),
 			glm::vec3(1.0f, 0.9f, 0.9f),
 			0.001f,
 			0.1f
@@ -140,9 +150,9 @@ public:
 
 		pointLights[0] = PointLight( // cave light
 			glm::vec3(28.5f, 2.0f, 10.0f),
-			glm::vec3(1.0f, 0.0f, 1.0f)
+			glm::vec3(1.0f, 0.5f, 1.0f)
 		);
-		pointLights[0].setIntensity(0.4, 0.7);
+		pointLights[0].setIntensity(0.4, 0.8);
 		pointLights[0].setFalloff(0.7f, 0.3f, 0.12f);
 
 		pointLights[1] = PointLight(
@@ -251,8 +261,8 @@ public:
 			plainTexture,
 			glm::vec3(36.0f, 3.0f, 10.0f),
 			45.0f,
-			glm::vec3(0.0f, 1.0f, 0.5f),
-			glm::vec3(0.4, 0.4, 0.4)
+			glm::vec3(0.0f, 1.1f, 0.5f),
+			glm::vec3(0.6f, 0.6f, 0.6f)
 		);
 
 		// cave box 2
@@ -261,8 +271,8 @@ public:
 			plainTexture,
 			glm::vec3(26.0f, 3.0f, 10.0f),
 			0.0f,
-			glm::vec3(0.5f, 1.0f, 0.0f),
-			glm::vec3(0.4, 0.4, 0.4)
+			glm::vec3(0.5f, 0.7f, 0.0f),
+			glm::vec3(0.6f, 0.6f, 0.6f)
 		);
 
 		// cave box 3
@@ -271,8 +281,8 @@ public:
 			plainTexture,
 			glm::vec3(31.0f, 3.0f, 15.0f),
 			45.0f,
-			glm::vec3(1.0f, 1.0f, 0.0f),
-			glm::vec3(0.4, 0.4, 0.4)
+			glm::vec3(1.0f, 0.8f, 0.0f),
+			glm::vec3(0.6f, 0.6f, 0.6f)
 		);
 
 		// cave box 4
@@ -281,8 +291,8 @@ public:
 			plainTexture,
 			glm::vec3(31.0f, 3.0f, 6.0f),
 			45.0f,
-			glm::vec3(0.0f, 1.0f, 1.0f),
-			glm::vec3(0.4, 0.4, 0.4)
+			glm::vec3(0.0f, 1.3f, 1.0f),
+			glm::vec3(0.6f, 0.6f, 0.6f)
 		);
 
 		// cave box 5
@@ -292,7 +302,7 @@ public:
 			glm::vec3(26.0f, 3.0f, 7.0f),
 			45.0f,
 			glm::vec3(1.0f, 1.0f, 0.0f),
-			glm::vec3(0.4, 0.4, 0.4)
+			glm::vec3(0.6f, 0.6f, 0.6f)
 		);
 
 		// floor1
@@ -650,16 +660,16 @@ public:
 
 	void renderCat() {
 		glm::mat4 model1 = glm::mat4(1);
-		//model1 = glm::translate(model1, glm::vec3(10.0f, 0.5f, 22.5f));
-		model1 = glm::translate(model1, glm::vec3(7.0f, 0.5f, 1.5f));
+		model1 = glm::translate(model1, glm::vec3(10.0f, 0.5f, 22.5f));
+		//model1 = glm::translate(model1, glm::vec3(7.0f, 0.5f, 1.5f));
 		model1 = glm::rotate(model1, glm::radians(-90.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f));
 
 		incrementArgument += 0.05f;
-		//model1 = glm::rotate(model1, glm::radians(incrementArgument), glm::vec3(0.0f, 0.0f, 1.0f));
-		//model1 = glm::translate(model1, glm::vec3(-2.0f, 0.0f, 0.0f));
+		model1 = glm::rotate(model1, glm::radians(incrementArgument), glm::vec3(0.0f, 0.0f, 1.0f));
+		model1 = glm::translate(model1, glm::vec3(-2.0f, 0.0f, 0.0f));
 
-		model1 = glm::scale(model1, glm::vec3(0.1f, 0.1f, 0.1f));
+		model1 = glm::scale(model1, glm::vec3(0.04f, 0.04f, 0.04f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
 			glm::value_ptr(model1));
 		plant.render();
@@ -686,10 +696,8 @@ public:
 		for (auto &prism : prisms) {
 			prism.transform();
 
-			if (i <= 5) {
-				prism.getModelMatrix() = glm::rotate(prism.getModelMatrix(), 
-					glm::radians(incrementArgument),
-					glm::vec3(0.0f, 0.0f, 1.0f));
+			if (i < 5) {
+				prism.setRotationAngle(0.005f * incrementArgument);
 			}
 
 			// access uniform variables for shaders
@@ -925,6 +933,9 @@ public:
 		// Use the bitwise OR '|' to clear both color buffer bit
 		// and the depth buffer bit
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		skybox.drawSkybox(glfwCamera.calculateViewMatrix(), 
+			glfwWindow->getProjection());
 
 		// Use the shader program
 		// This will grab the shader with this ID
