@@ -13,8 +13,8 @@ public:
 		glm::vec3 _color = glm::vec3(1.0f, 1.0f, 1.0f), 
 		GLfloat dIntensity = 0.2f,
 		GLfloat aIntensity = 1.0f,
-		GLuint _shadowWidth = 1024,
-		GLuint _shadowHeight = 1024);
+		GLuint _shadowWidth = 2048,
+		GLuint _shadowHeight = 2048);
 	
 	
 	~Light();

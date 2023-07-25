@@ -20,12 +20,12 @@ DirectionalLight::DirectionalLight(
 	dLightTransformMatrix = glm::mat4(1.0f);
 	direction = glm::vec3(_direction);
 	m_lightProjectionMat = glm::ortho(
-		-50.0f, // left
-		50.0f, // right
-		-50.0f, // bottom
-		50.0f, // top
+		-200.0f, // left
+		200.0f, // right
+		-200.0f, // bottom
+		200.0f, // top
 		0.01f, // near
-		150.0f // far
+		250.0f // far
 	);
 }
 

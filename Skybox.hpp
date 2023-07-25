@@ -17,6 +17,7 @@ class Skybox {
 public:
 	Skybox();
 	Skybox(std::vector<std::string> _faceLocations);
+	Skybox(std::string *_faceLocations, int _faces = 6);
 
 	~Skybox();
 

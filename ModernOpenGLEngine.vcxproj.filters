@@ -152,6 +152,12 @@
     <ClInclude Include="Skybox.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="WorldLoader.cpp">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldLoader.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">

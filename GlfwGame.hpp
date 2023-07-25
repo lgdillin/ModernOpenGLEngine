@@ -28,16 +28,19 @@
 #include "SpotLight.hpp"
 #include "MeshGroup.hpp"
 #include "Skybox.hpp"
+
+// for starting the world
+#include "WorldLoader.cpp"
+
 //#include "MeshCollider.hpp"
 
 class GlfwGame {
 private:
-	std::vector<Mesh*> meshes;
 	std::vector<Shader*> shaders;
 	std::vector<RectangularPrism> prisms;
 
 	std::vector<RectangularPrism> prisms2;
-	std::vector < std::string> skyboxFaces;
+	std::vector <std::string> skyboxFaces;
 	//std::vector<PointLight> pointLights;
 	//std::vector<SpotLight> spotLights;
 
@@ -87,16 +90,18 @@ private:
 	Shader *directionalShadowShader, shadowPass;
 
 	float incrementArgument;
-
+	WorldLoader worldLoader;
+	//std::vector<RectangularPrism> *prismsPtr;
 public:
 	GlfwGame() {
-		meshes = std::vector<Mesh*>();
 		shaders = std::vector<Shader*>();
-		prisms = std::vector<RectangularPrism>();
+		//prisms = std::vector<RectangularPrism>();
 		//pointLights = std::vector<PointLight>();
 		//spotLights = std::vector<SpotLight>();
+		
+		
 
-		uniformModel = 99;
+		uniformModel = 0;
 		uniformProjection = 0;
 		uniformView = 0;
 
@@ -104,11 +109,9 @@ public:
 		lastTime = 0.0f;
 
 		glfwWindow = NULL;
-		//cameraBall = CameraBall();
 		
 		lightTransform = glm::mat4(1);
 		incrementArgument = 1.0f;
-
 	}
 
 	// Define a callback function
@@ -128,100 +131,13 @@ public:
 		glfwWindow = new GlfwWindow(800, 600);
 		glfwWindow->initialize();
 
+		WorldLoader::load();
+		prisms = WorldLoader::m_prisms;
+
 		glfwCamera = GlfwCamera();
 		cameraBall = CameraBall(&glfwCamera);
 
-		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_rt.tga");
-		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_lf.tga");
-		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_up.tga");
-		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_dn.tga");
-		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_bk.tga");
-		skyboxFaces.push_back("resources/skyboxes/ame_nebula/purplenebula_ft.tga");
-		skybox = Skybox(skyboxFaces);
 
-
-		directionalLight = DirectionalLight(
-			glm::vec3(5.0f, 28.0f, 25.0f),
-			glm::vec3(1.0f, 0.9f, 0.9f),
-			0.001f,
-			0.1f
-		);
-		directionalLight.initShadowMap();
-
-		pointLights[0] = PointLight( // cave light
-			glm::vec3(28.5f, 2.0f, 10.0f),
-			glm::vec3(1.0f, 0.5f, 1.0f)
-		);
-		pointLights[0].setIntensity(0.4, 0.8);
-		pointLights[0].setFalloff(0.7f, 0.3f, 0.12f);
-
-		pointLights[1] = PointLight(
-			glm::vec3(8.0f, 2.5f, -0.5f),
-			glm::vec3(1.0f, 1.0f, 0.0f)
-		);
-		pointLights[2] = PointLight(
-			glm::vec3(10.0f, 6.0f, 22.5f),
-			glm::vec3(1.0f, 0.5f, 0.0f)
-		);
-		pointLights[2].setIntensity(0.4f, 0.8f);
-		//pointLights[0].setFalloff(0.7f, 0.3f, 0.12f);
-		
-
-		for (auto &pl : pointLights) {
-			pl.initOmniShadowMap();
-		}
-
-		//singlePointLight = PointLight(
-		//	glm::vec3(8.0f, 1.0f, 1.0f),
-		//	glm::vec3(1.0f, 1.0f, 1.0f)
-		//);
-		//singlePointLight.initOmniShadowMap();
-		
-		SpotLight sp1 = SpotLight(glm::vec3(-1.0f, 12.0f, 0.0f));
-		sp1.setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
-		sp1.setEdge(20.0f);
-		sp1.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
-		spotLights[0] = sp1;
-
-		SpotLight sp2 = SpotLight(glm::vec3(12.0f, 4.0f, 5.0f));
-		sp2.setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
-		sp2.setConstantFactor(0.02f);
-		sp2.setLinearFactor(0.006f);
-		sp2.setEdge(30.0f);
-		sp2.setColor(glm::vec3(1.0f, 0.0f, 1.0f));
-		spotLights[1] = sp2;
-
-		SpotLight sp3 = SpotLight(glm::vec3(10.0f, 3.0f, 14.5f));
-		sp3.setDirection(glm::vec3(0.0f, -1.0f, 0.0f));
-		sp3.setEdge(65.0f);
-		sp3.setColor(glm::vec3(0.0f, 1.0f, 1.0f));
-		spotLights[2] = sp3;
-
-		// Flashlight
-		SpotLight sp4 = SpotLight(glfwCamera.getCameraPosition());
-		sp4.setDirection(glfwCamera.getCameraFront());
-		sp4.setEdge(10.0f);
-		sp4.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
-		sp4.setIntensity(0.2f, 0.8f);
-		spotLights[3] = sp4;
-
-		for (auto &sl : spotLights) {
-			sl.initOmniShadowMap();
-		}
-
-
-		brickTexture = new Texture("resources/brick.png");
-		brickTexture->loadTextureAlphaOption(true);
-		dirtTexture = new Texture("resources/dirt.png");
-		dirtTexture->loadTextureAlphaOption(true);
-		grassTexture = new Texture("resources/grass.png");
-		grassTexture->loadTextureAlphaOption(true);
-		boxTexture = new Texture("resources/box.png");
-		boxTexture->loadTextureAlphaOption(true);
-		rustTexture = new Texture("resources/rusty.png");
-		rustTexture->loadTextureAlphaOption(true);
-		plainTexture = new Texture("resources/plain.png");
-		plainTexture->loadTextureAlphaOption(true);
 
 		std::string vShader = "./vertexShader.vert";
 		std::string fShader = "./fragmentShader.frag";
@@ -254,408 +170,6 @@ public:
 
 		plant = MeshGroup();
 		plant.load("resources/12221_Cat_v1_l3.obj");
-
-		// cave box 1
-		addNewBrushS(
-			"white",
-			plainTexture,
-			glm::vec3(36.0f, 3.0f, 10.0f),
-			45.0f,
-			glm::vec3(0.0f, 1.1f, 0.5f),
-			glm::vec3(0.6f, 0.6f, 0.6f)
-		);
-
-		// cave box 2
-		addNewBrushS(
-			"white",
-			plainTexture,
-			glm::vec3(26.0f, 3.0f, 10.0f),
-			0.0f,
-			glm::vec3(0.5f, 0.7f, 0.0f),
-			glm::vec3(0.6f, 0.6f, 0.6f)
-		);
-
-		// cave box 3
-		addNewBrushS(
-			"white",
-			plainTexture,
-			glm::vec3(31.0f, 3.0f, 15.0f),
-			45.0f,
-			glm::vec3(1.0f, 0.8f, 0.0f),
-			glm::vec3(0.6f, 0.6f, 0.6f)
-		);
-
-		// cave box 4
-		addNewBrushS(
-			"white",
-			plainTexture,
-			glm::vec3(31.0f, 3.0f, 6.0f),
-			45.0f,
-			glm::vec3(0.0f, 1.3f, 1.0f),
-			glm::vec3(0.6f, 0.6f, 0.6f)
-		);
-
-		// cave box 5
-		addNewBrushS(
-			"white",
-			plainTexture,
-			glm::vec3(26.0f, 3.0f, 7.0f),
-			45.0f,
-			glm::vec3(1.0f, 1.0f, 0.0f),
-			glm::vec3(0.6f, 0.6f, 0.6f)
-		);
-
-		// floor1
-		addNewBrushS(
-			"green",
-			grassTexture,
-			glm::vec3(0.0f, 0.0f, 0.0f),
-			90.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(10.0f, 10.0f, 1.0f));
-
-		// floor 2
-		addNewBrushS(
-			"green",
-			grassTexture,
-			glm::vec3(10.0f, 0.0f, 0.0f),
-			90.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(10.0f, 10.0f, 1.0f));
-
-		// floor 3
-		addNewBrushS(
-			"green",
-			grassTexture,
-			glm::vec3(10.0f, 0.0f, 10.0f),
-			90.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(10.0f, 10.0f, 1.0f));
-
-		// floor 4
-		addNewBrushS(
-			"green",
-			dirtTexture,
-			glm::vec3(10.0f, 0.0f, 22.5f),
-			90.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(15.0f, 15.0f, 1.0f));
-
-		// floor 5 (alley)
-		addNewBrushS(
-			"green",
-			grassTexture,
-			glm::vec3(18.0f, 0.0f, 10.0f),
-			0.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(6.0f, 1.0f, 5.0f));
-
-		// ceiling 5 (alley)
-		addNewBrushS(
-			"green",
-			rustTexture,
-			glm::vec3(18.0f, 6.0f, 10.0f),
-			0.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(6.0f, 1.0f, 7.0f));
-
-		// floor 6 (cave)
-		addNewBrushS(
-			"green",
-			dirtTexture,
-			glm::vec3(31.0f, 0.0f, 10.0f),
-			0.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(20.0f, 1.0f, 20.0f));
-
-		// ceiling 6 (cave)
-		addNewBrushS(
-			"green",
-			rustTexture,
-			glm::vec3(31.0f, 6.0f, 10.0f),
-			0.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(20.0f, 1.0f, 20.0f));
-
-		// left front wall cave
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(21.5f, 3.0f, 3.75f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(1.0f, 5.0f, 7.5f)
-		);
-
-		// right front wall cave
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(21.5f, 3.0f, 16.25f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(1.0f, 5.0f, 7.5f)
-		);
-
-		// back wall cave
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(40.5f, 3.0f, 10.0f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(1.0f, 5.0f, 20.0f)
-		);
-
-		// left wall cave
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(31.0f, 3.0f, 0.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(18.0f, 5.0f, 1.0f)
-		);
-
-		// right wall cave
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(31.0f, 3.0f, 19.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(18.0f, 5.0f, 1.0f)
-		);
-
-
-		// house ceiling
-		addNewBrushS(
-			"green",
-			rustTexture,
-			glm::vec3(10.0f, 9.0f, 22.5f),
-			90.0f,
-			glm::vec3(1.0f, 0.0f, 0.0f),
-			glm::vec3(15.0f, 15.0f, 1.0f));
-
-		// short right wall room 1
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(2.5f, 3.0f, 4.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(15.0f, 5.0f, 1.0f)
-		);
-
-		// long left wall room 1
-		addNewBrushS(
-			"blue",
-			brickTexture,
-			glm::vec3(5.0f, 3.0f, -4.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(20.0f, 5.0f, 1.0f)
-		);
-
-		// back wall room 1
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(-4.5f, 3.0f, 0.0),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(8.0f, 5.0f, 1.0f)
-		);
-
-		// far wall room 2
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(15.5f, 3.0f, 1.25f),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(12.5f, 5.0f, 1.0f)
-		);
-
-		// right wall room 3
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(5.5f, 3.0f, 10.0f),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(10.0f, 5.0f, 1.0f)
-		);
-
-		// left wall room 3
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(15.5f, 3.0f, 13.75f),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(2.5f, 5.0f, 1.0f)
-		);
-
-		// door partition
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(4.5f, 3.0f, 3.25f),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(1.5f, 5.0f, 1.0f)
-		);
-
-		// door partition
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(4.5f, 3.0f, -3.25f),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(1.5f, 5.0f, 1.0f)
-		);
-
-		// house left door partition
-		addNewBrushS(
-			"blue",
-			brickTexture,
-			glm::vec3(15.0f, 3.0f, 15.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(5.0f, 5.0f, 1.0f)
-		);
-
-		// house right door partition
-		addNewBrushS(
-			"blue",
-			brickTexture,
-			glm::vec3(5.0f, 3.0f, 15.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(5.0f, 5.0f, 1.0f)
-		);
-
-		// house door header
-		addNewBrushS(
-			"blue",
-			brickTexture,
-			glm::vec3(10.0f, 7.0f, 15.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(15.0f, 3.0f, 1.0f)
-		);
-
-		// house back wall
-		addNewBrushS(
-			"blue",
-			brickTexture,
-			glm::vec3(10.0f, 4.5f, 29.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(15.0f, 8.0f, 1.0f)
-		);
-
-		// house left wall
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(17.0f, 4.5f, 22.5f),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(13.0f, 8.0f, 1.0f)
-		);
-
-		// house right wall
-		addNewBrushS(
-			"red",
-			brickTexture,
-			glm::vec3(3.0f, 4.5f, 22.5f),
-			90.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(13.0f, 8.0f, 1.0f)
-		);
-
-		addNewBrushS(
-			"white",
-			boxTexture,
-			glm::vec3(0.0f, 3.0f, 0.0f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(1.0f, 1.0f, 1.0f)
-		);
-
-
-
-		addNewBrushS(
-			"white",
-			plainTexture,
-			glm::vec3(10.0f, 3.0f, 22.5f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(2.0f, 2.0f, 2.0f)
-		);
-
-		// Left Wall alley
-		addNewBrushS(
-			"blue",
-			brickTexture,
-			glm::vec3(18.5f, 3.0f, 7.0f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(5.0f, 5.0f, 1.0f)
-		);
-
-		// right Wall alley
-		addNewBrushS(
-			"blue",
-			brickTexture,
-			glm::vec3(18.5f, 3.0f, 13.0f),
-			0.0f,
-			glm::vec3(0.0f, 1.0f, 0.0f),
-			glm::vec3(5.0f, 5.0f, 1.0f)
-		);
-
-
-	}
-
-	void addNewBrush(
-		std::string color,
-		Texture* texture,
-		glm::vec3 translation,
-		float rotationAngle,
-		glm::vec3 rotVector,
-		glm::vec3 scale
-	) {
-		RectangularPrism *rp = new RectangularPrism();
-		rp->initialize();
-		rp->pickColor(color);
-		rp->setTexture(texture);
-		rp->setTranslationVector(translation);
-		rp->setRotationAngle(glm::radians(rotationAngle));
-		rp->setRotationVector(rotVector);
-		rp->setScalingVector(scale);
-		//prisms.push_back(rp);
-	}
-
-	void addNewBrushS(
-		std::string color,
-		Texture *texture,
-		glm::vec3 translation,
-		float rotationAngle,
-		glm::vec3 rotVector,
-		glm::vec3 scale
-	) {
-		RectangularPrism rp = RectangularPrism();
-		rp.initialize();
-		rp.pickColor(color);
-		rp.setTexture(texture);
-		rp.setTranslationVector(translation);
-		rp.setRotationAngle(glm::radians(rotationAngle));
-		rp.setRotationVector(rotVector);
-		rp.setScalingVector(scale);
-		prisms.push_back(rp);
 	}
 
 	void renderCat() {
@@ -985,35 +499,6 @@ public:
 		glFrontFace(GL_CCW);
 		//glEnable(GL_DEPTH_TEST);
 
-		// Testing shadows
-		//addNewBrushS(
-		//	"white",
-		//	boxTexture,
-		//	glm::vec3(0.0f, 0.0f, 0.0f),
-		//	0.0f,
-		//	glm::vec3(0.0f, 1.0f, 0.0f),
-		//	glm::vec3(8.0f, 1.0f, 8.0f)
-		//);
-
-		//// Testing shadows
-		//addNewBrushS(
-		//	"white",
-		//	boxTexture,
-		//	glm::vec3(0.0f, 3.0f, 0.0f),
-		//	45.0f,
-		//	glm::vec3(1.0f, 0.0f, 1.0f),
-		//	glm::vec3(1.0f, 1.0f, 1.0f)
-		//);
-
-		//// Testing shadows
-		//addNewBrushS(
-		//	"white",
-		//	boxTexture,
-		//	glm::vec3(2.0f, 3.0f, 3.0f),
-		//	-45.0f,
-		//	glm::vec3(1.0f, 0.0f, 1.0f),
-		//	glm::vec3(1.0f, 5.0f, 1.0f)
-		//);
 
 		float sinArg = 0.25f;
 
@@ -1039,13 +524,10 @@ public:
 			}
 
 			glm::vec3 dir = directionalLight.getDirection();
-			//dir.z += 0.007f * glm::sin(glm::radians(sinArg));
-			//std::cout << glm::sin(glm::radians(sinArg)) << std::endl;
 			directionalLight.setDirection(dir);
 
 
 			directionalShadowMapPass();
-			//omniShadowMapPass(&singlePointLight);
 			for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
 				omniShadowMapPass(&pointLights[i], i);
 			}
@@ -1086,85 +568,6 @@ public:
 				//	<< depthData[i] << std::endl;
 				//break;
 			}
-		}
-	}
-
-	void testRenderPath() {
-		directionalLight.getShadowMap()->bindToFrameBuffer();
-		glClear(GL_DEPTH_BUFFER_BIT);
-		shaders[1]->useShader();
-
-		uniformModel = shaders[1]->getModelLocation();
-		lightTransform = directionalLight.calculateLightTransform();
-		shaders[1]->setDirectionalLightTransform(
-			lightTransform);
-
-		for (auto &prism : prisms2) {
-			prism.transform();
-			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
-				glm::value_ptr(prism.getModelMatrix()));
-
-			prism.renderMesh();
-
-		}
-
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-
-		depthData();
-		//////////////////////////////////////////////////
-
-		glfwWindow->resetViewport();
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		shaders[0]->useShader();
-		uniformModel = shaders[0]->getModelLocation();
-		uniformProjection = shaders[0]->getProjectionLocation();
-		uniformView = shaders[0]->getViewLocation();
-		uniformScaleMatrix = shaders[0]->getScaleMatrixLocation();
-		uniformEyePosition = shaders[0]->getEyePositionLocation();
-		uniformSpecularIntensity = shaders[0]->getSpecularIntensityLocation();
-		uniformShininess = shaders[0]->getShininessLocation();
-		shaders[0]->setDirectionalLight(&directionalLight);
-		//shaders[0]->setPointLights(pointLights, 3);
-		//shaders[0]->setSpotLights(spotLights, 4);
-
-		lightTransform = directionalLight.calculateLightTransform();
-		shaders[0]->setDirectionalLightTransform(
-			lightTransform);
-
-		directionalLight.getShadowMap()->read(GL_TEXTURE1);
-		shaders[0]->setTexture(0);
-		shaders[0]->setDirectionalShadowMap(1);
-
-		glm::vec3 flashPos = glfwCamera.getCameraPosition();
-		flashPos.y = flashPos.y - 0.3f;
-		spotLights[3].setFlash(flashPos,
-			glfwCamera.getCameraFront());
-
-		//////////////////////////////////////////////////////////
-		glUniform3f(uniformEyePosition,
-			glfwCamera.getCameraPosition().x,
-			glfwCamera.getCameraPosition().y,
-			glfwCamera.getCameraPosition().z);
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
-			glm::value_ptr(glfwWindow->getProjection()));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
-			glm::value_ptr(glfwCamera.calculateViewMatrix()));
-
-		int i = 0;
-		for (auto &prism : prisms2) {
-			prism.transform();
-			glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
-				glm::value_ptr(prism.getModelMatrix()));
-			glUniformMatrix4fv(uniformScaleMatrix, 1, GL_FALSE,
-				glm::value_ptr(prism.scaleTexture()));
-
-			prism.getTexture()->useTexture();
-
-			dullMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
-			prism.renderMesh();
-
-			++i;
 		}
 	}
 };
