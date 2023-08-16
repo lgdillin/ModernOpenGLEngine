@@ -7,12 +7,18 @@
 #include "PointLight.hpp"
 #include "DirectionalLight.hpp"
 #include "Skybox.hpp"
+#include "Shader.hpp"
+#include "Material.hpp"
+#include "MeshGroup.hpp"
 
 class WorldLoader {
 public:
 
 	static std::vector<Texture *> m_textures;
+	static std::vector<Material> m_materials;
+	static std::vector<Shader *> m_shaders;
 	static std::vector<RectangularPrism> m_prisms;
+	static std::vector<MeshGroup> m_meshGroups;
 	
 	static Skybox m_skybox;
 
@@ -31,6 +37,12 @@ public:
 	static void loadSpotLights();
 
 	static void loadTextures();
+	
+	static void loadMaterials();
+
+	static void loadShaders();
+
+	static void loadMeshGroups();
 
 	static void addNewBrushS(
 		std::string color,

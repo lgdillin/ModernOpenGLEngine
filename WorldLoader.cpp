@@ -5,6 +5,12 @@ std::vector<RectangularPrism> WorldLoader::m_prisms
 
 std::vector<Texture *> WorldLoader::m_textures = std::vector<Texture *>();
 
+std::vector<Material> WorldLoader::m_materials = std::vector<Material>();
+
+std::vector<Shader *> WorldLoader::m_shaders = std::vector<Shader *>();
+
+std::vector<MeshGroup> WorldLoader::m_meshGroups = std::vector<MeshGroup>();
+
 Skybox WorldLoader::m_skybox;
 
 DirectionalLight WorldLoader::m_directionalLight;
@@ -14,8 +20,15 @@ SpotLight WorldLoader::m_spotLights[MAX_SPOT_LIGHTS] = {};
 
 
 void WorldLoader::load() {
+	WorldLoader::loadShaders();
 	WorldLoader::loadTextures();
+	WorldLoader::loadMaterials();
 	WorldLoader::loadBrushes();
+	WorldLoader::loadSkybox();
+	WorldLoader::loadDirectionalLights();
+	WorldLoader::loadPointLights();
+	WorldLoader::loadSpotLights();
+	WorldLoader::loadMeshGroups();
 }
 
 void WorldLoader::loadSkybox() {
@@ -88,7 +101,7 @@ void WorldLoader::loadSpotLights() {
 	// Flashlight
 	SpotLight sp4 = SpotLight(glm::vec3(0.0f));
 	sp4.setDirection(glm::vec3(0.0f));
-	sp4.setEdge(10.0f);
+	sp4.setEdge(10.0f); 
 	sp4.setColor(glm::vec3(1.0f, 1.0f, 1.0f));
 	sp4.setIntensity(0.2f, 0.8f);
 	WorldLoader::m_spotLights[3] = sp4;
@@ -116,6 +129,47 @@ void WorldLoader::loadTextures() {
 
 	WorldLoader::m_textures.push_back(new Texture("resources/plain.png"));
 	WorldLoader::m_textures[5]->loadTextureAlphaOption(true);
+}
+
+void WorldLoader::loadMaterials() {
+	Material shinyMaterial = Material(1.0f, 32);
+	WorldLoader::m_materials.push_back(shinyMaterial);
+
+	Material dullMaterial = Material(1.0f, 64);
+	WorldLoader::m_materials.push_back(dullMaterial);
+
+	Material superShinyMaterial = Material(1.0f, 128);
+	WorldLoader::m_materials.push_back(superShinyMaterial);
+}
+
+void WorldLoader::loadShaders() {
+	std::string vShader = "vertexShader.vert";
+	std::string fShader = "fragmentShader.frag";
+
+	std::string vShader1 = "vDirectionalShadowMap.vert";
+	std::string fShader1 = "fDirectionalShadowMap.frag";
+
+	std::string vShader2 = "omniShadowMap.vert";
+	std::string gShader2 = "omniShadowMap.geom";
+	std::string fShader2 = "omniShadowMap.frag";
+
+	Shader *shader1 = new Shader();
+	shader1->createFromFile(vShader, fShader);
+	WorldLoader::m_shaders.push_back(shader1);
+
+	Shader *shader2 = new Shader();
+	shader2->createFromFile(vShader1, fShader1);
+	WorldLoader::m_shaders.push_back(shader2);
+
+	Shader *shader3 = new Shader();
+	shader3->createFromFile(vShader2, gShader2, fShader2);
+	WorldLoader::m_shaders.push_back(shader3);
+}
+
+void WorldLoader::loadMeshGroups() {
+	MeshGroup cat = MeshGroup();
+	cat.load("resources/12221_Cat_v1_l3.obj");
+	WorldLoader::m_meshGroups.push_back(cat);
 }
 
 

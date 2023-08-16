@@ -36,6 +36,7 @@
 
 class GlfwGame {
 private:
+	std::vector<Material> materials;
 	std::vector<Shader*> shaders;
 	std::vector<RectangularPrism> prisms;
 
@@ -44,8 +45,10 @@ private:
 	//std::vector<PointLight> pointLights;
 	//std::vector<SpotLight> spotLights;
 
-	SpotLight spotLights[MAX_SPOT_LIGHTS];
-	PointLight pointLights[MAX_POINT_LIGHTS];
+	//SpotLight spotLights[MAX_SPOT_LIGHTS];
+	//PointLight pointLights[MAX_POINT_LIGHTS];
+	SpotLight *spotLights;
+	PointLight *pointLights;
 
 	std::string vShader, fShader;
 
@@ -85,7 +88,7 @@ private:
 	GLenum error;
 
 	Skybox skybox;
-	MeshGroup plant;
+	MeshGroup cat;
 
 	Shader *directionalShadowShader, shadowPass;
 
@@ -126,50 +129,25 @@ public:
 	// Have some stuff to get the loop started
 	void init() {
 		glEnable(GL_DEBUG_OUTPUT);
-		//glDebugMessageCallback(DebugMessageCallback, nullptr);
 
 		glfwWindow = new GlfwWindow(800, 600);
 		glfwWindow->initialize();
 
 		WorldLoader::load();
 		prisms = WorldLoader::m_prisms;
+		directionalLight = WorldLoader::m_directionalLight;
+		spotLights = WorldLoader::m_spotLights;
+		pointLights = WorldLoader::m_pointLights;
+		skybox = WorldLoader::m_skybox;
+		shaders = WorldLoader::m_shaders;
 
 		glfwCamera = GlfwCamera();
-		cameraBall = CameraBall(&glfwCamera);
 
+		shinyMaterial = WorldLoader::m_materials[0];
+		dullMaterial = WorldLoader::m_materials[1];
+		superShinyMaterial = WorldLoader::m_materials[2];
 
-
-		std::string vShader = "./vertexShader.vert";
-		std::string fShader = "./fragmentShader.frag";
-		
-		std::string vShader1 = "vDirectionalShadowMap.vert";
-		std::string fShader1 = "fDirectionalShadowMap.frag";
-
-		std::string vShader2 = "omniShadowMap.vert";
-		std::string gShader2 = "omniShadowMap.geom";
-		std::string fShader2 = "omniShadowMap.frag";
-
-		Shader *shader1 = new Shader();
-		shader1->createFromFile(vShader, fShader);
-		shaders.push_back(shader1);
-
-		Shader *shader2 = new Shader();
-		shader2->createFromFile(vShader1, fShader1);
-		shaders.push_back(shader2);
-		directionalShadowShader = shaders[1];
-
-		Shader *shader3 = new Shader();
-		shader3->createFromFile(vShader2, gShader2, fShader2);
-		shaders.push_back(shader3);
-
-		shinyMaterial = Material(1.0f, 32);
-		//dullMaterial = Material(0.4f, 8);
-		dullMaterial = Material(1.0f, 64);
-
-		superShinyMaterial = Material(1.0f, 128);
-
-		plant = MeshGroup();
-		plant.load("resources/12221_Cat_v1_l3.obj");
+		cat = WorldLoader::m_meshGroups[0];
 	}
 
 	void renderCat() {
@@ -186,7 +164,7 @@ public:
 		model1 = glm::scale(model1, glm::vec3(0.04f, 0.04f, 0.04f));
 		glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
 			glm::value_ptr(model1));
-		plant.render();
+		cat.render();
 	}
 
 	void renderScene() {
