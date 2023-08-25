@@ -77,18 +77,21 @@ bool ShadowMap::init(unsigned int _width, unsigned int _height) {
 void ShadowMap::bindToFrameBuffer() {
 
 	glBindFramebuffer(GL_FRAMEBUFFER, m_frameBufferObject);
+	GLenum bindFrameBufferStatus = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "OmniShadowMap::bindToFrameBuffer() error "
+		std::cout << "ShadowMap::bindToFrameBuffer() error "
 			<< error << " can't bind to framebuffer: "
-			<< m_frameBufferObject << std::endl;
+			<< m_frameBufferObject << " with frameBufferStatus: " 
+			<< bindFrameBufferStatus << std::endl;
 	}
 
 
 	glViewport(0, 0, m_width, m_height);
 	error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "OmniShadowMap::bindToFrameBuffer() error "
+		std::cout << "ShadowMap::bindToFrameBuffer() error "
 			<< error << " can't resize viewport: " << std::endl;
 	}
 

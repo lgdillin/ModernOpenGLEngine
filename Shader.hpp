@@ -26,23 +26,10 @@ public:
 
 	void createFromString(std::string vertexCode, std::string fragmentCode);
 
+	void setVec3(std::string _glslCode, glm::vec3 _vec3);
+	void setFloat(std::string _glslCode, float _float);
+
 	void validate();
-
-	GLuint getModelLocation();
-	GLuint getProjectionLocation();
-	GLuint getViewLocation();
-	GLuint getAmbientIntensityLocation();
-	GLuint getColorLocation();
-	GLuint getScaleMatrixLocation();
-	GLuint getDiffuseIntensity();
-	GLuint getDirectionLocation();
-	GLuint getSpecularIntensityLocation();
-	GLuint getShininessLocation();
-	GLuint getEyePositionLocation();
-	GLuint getOmniLightPositionLocation();
-	GLuint getFarPlaneLocation();
-
-	GLuint getShaderId() { return shaderId; }
 
 	void setDirectionalLight(DirectionalLight *dLight);
 	void setPointLights(PointLight *pointLight, unsigned int lightCount,
@@ -59,6 +46,21 @@ public:
 
 	void useShader();
 	void clearShader();
+
+	GLuint getShaderId() { return shaderId; }
+	GLuint getModelLocation() { return uniformModel; }
+	GLuint getProjectionLocation() { return uniformProjection; }
+	GLuint getViewLocation() { return uniformView; }
+	GLuint getAmbientIntensityLocation() { return uniformDirectionalLight.uniformAmbientIntensity; }
+	GLuint getColorLocation() { return uniformDirectionalLight.uniformColor; }
+	GLuint getScaleMatrixLocation() { return uniformScaleMatrix; }
+	GLuint getDiffuseIntensity() { return uniformDirectionalLight.uniformDiffuseIntensity; }
+	GLuint getDirectionLocation() { return uniformDirectionalLight.uniformDirection; }
+	GLuint getSpecularIntensityLocation() { return uniformSpecularIntensity; }
+	GLuint getShininessLocation() { return uniformShininess; }
+	GLuint getEyePositionLocation() { return uniformEyePosition; }
+	GLuint getOmniLightPositionLocation() { return uniformOmniLightPosition; }
+	GLuint getFarPlaneLocation() { return uniformFarPlane; }
 
 private:
 
@@ -110,6 +112,8 @@ private:
 		std::string geometryCode,
 		std::string fragmentCode
 	);
+
+	void compileLights();
 
 	void compileProgram();
 

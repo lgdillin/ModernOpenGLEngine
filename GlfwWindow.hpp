@@ -104,6 +104,8 @@ public:
 	glm::mat4 getProjection() { return projection; }
 	GLint getBufferWidth() { return bufferWidth; }
 	GLint getBufferHeight() { return bufferHeight; }
+	GLint getWindowWidth() { return windowWidth; }
+	GLint getWindowHeight() { return windowHeight; }
 
 	bool getShouldClose() { return glfwWindowShouldClose(window); }
 

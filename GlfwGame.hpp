@@ -29,6 +29,8 @@
 #include "MeshGroup.hpp"
 #include "Skybox.hpp"
 
+#include "GBuffer.hpp"
+
 // for starting the world
 #include "WorldLoader.cpp"
 
@@ -42,13 +44,11 @@ private:
 
 	std::vector<RectangularPrism> prisms2;
 	std::vector <std::string> skyboxFaces;
-	//std::vector<PointLight> pointLights;
-	//std::vector<SpotLight> spotLights;
 
-	//SpotLight spotLights[MAX_SPOT_LIGHTS];
-	//PointLight pointLights[MAX_POINT_LIGHTS];
 	SpotLight *spotLights;
 	PointLight *pointLights;
+
+	GBuffer gBuffer;
 
 	std::string vShader, fShader;
 
@@ -78,7 +78,7 @@ private:
 	
 	Material shinyMaterial, dullMaterial, superShinyMaterial;
 
-	DirectionalLight directionalLight;
+	DirectionalLight *directionalLight;
 	glm::mat4 lightTransform;
 
 	unsigned int pointLightCount;
@@ -91,18 +91,15 @@ private:
 	MeshGroup cat;
 
 	Shader *directionalShadowShader, shadowPass;
+	Shader *dr_shaderGeomPass, *dr_shaderLightPass;
+	RectangularPrism *prismPtr;
 
 	float incrementArgument;
 	WorldLoader worldLoader;
-	//std::vector<RectangularPrism> *prismsPtr;
 public:
 	GlfwGame() {
 		shaders = std::vector<Shader*>();
-		//prisms = std::vector<RectangularPrism>();
-		//pointLights = std::vector<PointLight>();
-		//spotLights = std::vector<SpotLight>();
-		
-		
+		prismPtr = nullptr;
 
 		uniformModel = 0;
 		uniformProjection = 0;
@@ -135,11 +132,13 @@ public:
 
 		WorldLoader::load();
 		prisms = WorldLoader::m_prisms;
-		directionalLight = WorldLoader::m_directionalLight;
+		directionalLight = &WorldLoader::m_directionalLight;
 		spotLights = WorldLoader::m_spotLights;
 		pointLights = WorldLoader::m_pointLights;
 		skybox = WorldLoader::m_skybox;
 		shaders = WorldLoader::m_shaders;
+		//dr_shaderGeomPass = shaders[3];
+		//dr_shaderLightPass = shaders[4];
 
 		glfwCamera = GlfwCamera();
 
@@ -148,12 +147,15 @@ public:
 		superShinyMaterial = WorldLoader::m_materials[2];
 
 		cat = WorldLoader::m_meshGroups[0];
+		prismPtr = &prisms[0];
+
+		//gBuffer = GBuffer();
+		//gBuffer.init(glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight());
 	}
 
 	void renderCat() {
 		glm::mat4 model1 = glm::mat4(1);
 		model1 = glm::translate(model1, glm::vec3(10.0f, 0.5f, 22.5f));
-		//model1 = glm::translate(model1, glm::vec3(7.0f, 0.5f, 1.5f));
 		model1 = glm::rotate(model1, glm::radians(-90.0f),
 			glm::vec3(1.0f, 0.0f, 0.0f));
 
@@ -218,37 +220,15 @@ public:
 	}
 
 	void directionalShadowMapPass() {
-		GLenum error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "directionalShadowMapPass() error: " << error << std::endl;
-		} 
 
-		directionalLight.getShadowMap()->bindToFrameBuffer();
-
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "directionalShadowMapPass() error: " << error 
-				<< "When binding to framebuffer" << std::endl;
-		}
+		directionalLight->getShadowMap()->bindToFrameBuffer();
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "directionalShadowMapPass() error: " << error 
-				<< " When using glClear() " << std::endl;
-		}
-
 		shaders[1]->useShader();
 
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "directionalShadowMapPass() error: " << error 
-				<< " When calling useShader() " << std::endl;
-		}
-
 		uniformModel = shaders[1]->getModelLocation();
-		lightTransform = directionalLight.calculateLightTransform();
+		lightTransform = directionalLight->calculateLightTransform();
 		shaders[1]->setDirectionalLightTransform(
 			lightTransform);
 		shaders[1]->validate();
@@ -264,66 +244,18 @@ public:
 
 		renderCat();
 
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "directionalShadowMapPass() error: " << error
-				<< " When drawing the scene " << std::endl;
-		}
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "directionalShadowMapPass() error: " << error
-				<< " When unbinding framebuffer " << std::endl;
-		}
 	}
 
 	void omniShadowMapPass(PointLight *light, int i) {
-
-		GLenum error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error << std::endl;
-		} 
-
 		light->getShadowMap()->bindToFrameBuffer();
-
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error 
-				<< " at bindToFrameBuffer() " << std::endl;
-		}
 
 		glClear(GL_DEPTH_BUFFER_BIT);
 
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at glClear() " << std::endl;
-		}
-
 		Shader *omniShader = shaders[2];
 		omniShader->useShader();
-
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at useShader() " << std::endl;
-		}
-
 		uniformModel = omniShader->getModelLocation();
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at getModelLocation()" << std::endl;
-		}
-
 		uniformFarPlane = omniShader->getFarPlaneLocation();
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at getFarPlaneLocation()" << std::endl;
-		}
-
 		uniformOmniLightPos = omniShader->getOmniLightPositionLocation();
 
 
@@ -340,45 +272,16 @@ public:
 			glm::vec3 lPos = light->getPosition();
 			glm::vec3 pos = glm::vec3(
 				lPos.x + 0.05f * sin(glm::radians(incrementArgument)),
-				//lPos.x,
 				lPos.y,
-				//lPos.z + 0.02f * cos(glm::radians(incrementArgument)));
 				lPos.z);
 			light->setPosition(pos);
 		}
 
 		glUniform3f(uniformOmniLightPos, light->getPosition().x,
 			light->getPosition().y, light->getPosition().z);
-		
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at uniformOmniLightPos" << std::endl;
-		}
-		
 		glUniform1f(uniformFarPlane, light->getFarPlane());
-
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at uniformFarPlane" << std::endl;
-		}
-
 		omniShader->setLightMatrices(light->calculateLightTransform());
-
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at setLightMatrices" << std::endl;
-		}
-
-
 		shaders[2]->validate();
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " when validating shader" << std::endl;
-		}
 
 
 		for (auto &prism : prisms) {
@@ -387,29 +290,10 @@ public:
 				glm::value_ptr(prism.getModelMatrix()));
 
 			prism.renderMesh();
-
-			error = glGetError();
-			if (error != GL_NO_ERROR) {
-				std::cout << "omniShadowMapPass() error: " << error
-					<< " when rendering prism: " << &prism << std::endl;
-			}
-
 		}
 
 		renderCat();
-
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " when rendering cat " << std::endl;
-		}
-
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-		error = glGetError();
-		if (error != GL_NO_ERROR) {
-			std::cout << "omniShadowMapPass() error: " << error
-				<< " at unbinding framebuffer " << std::endl;
-		}
 	}
 
 	void renderPass() {
@@ -448,7 +332,7 @@ public:
 		// sets back to render viewport for the render pass
 
 
-		shaders[0]->setDirectionalLight(&directionalLight);
+		shaders[0]->setDirectionalLight(directionalLight);
 
 		// we are only working with one light right now
 		shaders[0]->setPointLights(pointLights, 3, 3, 0);
@@ -457,11 +341,10 @@ public:
 
 		//shaders[0]->setPointLights(&singlePointLight, 1, 2, 0);
 		
-		lightTransform = directionalLight.calculateLightTransform();
-		shaders[0]->setDirectionalLightTransform(
-			lightTransform);
+		lightTransform = directionalLight->calculateLightTransform();
+		shaders[0]->setDirectionalLightTransform(lightTransform);
+		directionalLight->getShadowMap()->read(GL_TEXTURE2);
 
-		directionalLight.getShadowMap()->read(GL_TEXTURE2);
 		shaders[0]->setTexture(1);
 		shaders[0]->setDirectionalShadowMap(2);
 
@@ -470,6 +353,156 @@ public:
 		renderScene();
 	}
 
+
+	void forwardRendering() {
+		// toggle flashlight
+		if (glfwCamera.getToggleFlashlight()) {
+			spotLights[3].setColor(glm::vec3(0.0f, 0.0f, 0.0f));
+		} else {
+			spotLights[3].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
+		}
+
+		glm::vec3 dir = directionalLight->getDirection();
+		directionalLight->setDirection(dir);
+
+
+		directionalShadowMapPass();
+		for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
+			omniShadowMapPass(&pointLights[i], i);
+		}
+
+		for (int i = 0; i < MAX_SPOT_LIGHTS; ++i) {
+			omniShadowMapPass(&spotLights[i], MAX_POINT_LIGHTS + i);
+		}
+
+		renderPass();
+	}
+	
+	void deferredRenderingLighting() {
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+		glEnable(GL_BLEND);
+		glBlendEquation(GL_FUNC_ADD);
+		glBlendFunc(GL_ONE, GL_ONE);
+
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		gBuffer.bindForReading();
+
+		// directional light
+
+		// point lights
+		glUniform3f(uniformEyePosition,
+			glfwCamera.getCameraPosition().x,
+			glfwCamera.getCameraPosition().y,
+			glfwCamera.getCameraPosition().z);
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
+			glm::value_ptr(glfwWindow->getProjection()));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
+			glm::value_ptr(glfwCamera.calculateViewMatrix()));
+
+		shaders[1]->useShader();
+
+		uniformModel = shaders[1]->getModelLocation();
+		lightTransform = directionalLight->calculateLightTransform();
+		shaders[1]->setDirectionalLightTransform(
+			lightTransform);
+		shaders[1]->validate();
+
+	}
+
+	void deferredRenderingGeometry() {
+
+		gBuffer.bindForWriting();
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// render the first prism and thats it
+
+		glUniform3f(uniformEyePosition,
+			glfwCamera.getCameraPosition().x,
+			glfwCamera.getCameraPosition().y,
+			glfwCamera.getCameraPosition().z);
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
+			glm::value_ptr(glfwWindow->getProjection()));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
+			glm::value_ptr(glfwCamera.calculateViewMatrix()));
+
+		auto &prism = prisms[0];
+		prism.transform();
+		glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
+			glm::value_ptr(prism.getModelMatrix()));
+		glUniformMatrix4fv(uniformScaleMatrix, 1, GL_FALSE,
+			glm::value_ptr(prism.scaleTexture()));
+
+		//prism.getTexture()->useTexture();
+		//superShinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
+		prism.renderMesh();
+	}
+
+	void deferredRendering() {
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer.getGBufferObject());
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+		// 1. Geometry Pass
+		//////////////////////////
+		glUniform3f(uniformEyePosition,
+			glfwCamera.getCameraPosition().x,
+			glfwCamera.getCameraPosition().y,
+			glfwCamera.getCameraPosition().z);
+		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
+			glm::value_ptr(glfwWindow->getProjection()));
+		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
+			glm::value_ptr(glfwCamera.calculateViewMatrix()));
+
+		dr_shaderGeomPass->useShader(); // Shader for the gBuffer (think shadowmap)
+		prismPtr->renderMesh();
+
+		// 2. Lighting pass
+		//////////////////////////
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		// activate lighting pass shader
+		// shaderlightpass.use();
+		dr_shaderLightPass->useShader();
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getGPosition());
+
+		glActiveTexture(GL_TEXTURE1);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getGNormal());
+
+		glActiveTexture(GL_TEXTURE2);
+		glBindTexture(GL_TEXTURE_2D, gBuffer.getGAlbedoSpecular());
+
+		// add in the lighting loop
+		dr_shaderLightPass->setVec3("lights[" + std::to_string(0)
+			+ "].position", glm::vec3(0.0f));
+		dr_shaderLightPass->setVec3("lights[" + std::to_string(0)
+			+ "].color", glm::vec3(1.0f));
+		dr_shaderLightPass->setFloat("lights[" + std::to_string(0)
+			+ "].linear", 0.7f);
+		dr_shaderLightPass->setFloat("lights[" + std::to_string(0)
+			+ "].quadratic", 1.8f);
+		dr_shaderLightPass->setVec3("viewPos",
+			glfwCamera.getCameraPosition());
+
+		// 2.5 copy content of geometry's depth buffer to default framebuffer's
+		// depth buffer
+		/////////////////////
+		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer.getGBufferObject());
+		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+
+		// blit to default framebuffer. note that this may or may not work as the
+		// internal formats of both the EBO and default framebuffer have ...
+		// the internal formats are implementation defined.
+		glBlitFramebuffer(0, 0, glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight(),
+			0, 0, glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight(),
+			GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+
+		// 3. render lights on top of scene
+		// shader light box.use()
+	}
 
 	void runGame() {
 		glEnable(GL_CULL_FACE);
@@ -494,29 +527,9 @@ public:
 			glfwCamera.mouseControl(glfwWindow->getMouseDeltaX(),
 				glfwWindow->getMouseDeltaY());
 
-			// toggle flashlight
-			if (glfwCamera.getToggleFlashlight()) {
-				spotLights[3].setColor(glm::vec3(0.0f, 0.0f, 0.0f));
-			} else {
-				spotLights[3].setColor(glm::vec3(1.0f, 1.0f, 1.0f));
-			}
 
-			glm::vec3 dir = directionalLight.getDirection();
-			directionalLight.setDirection(dir);
-
-
-			directionalShadowMapPass();
-			for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
-				omniShadowMapPass(&pointLights[i], i);
-			}
-
-			for (int i = 0; i < MAX_SPOT_LIGHTS; ++i) {
-				omniShadowMapPass(&spotLights[i], MAX_POINT_LIGHTS + i);
-			}
-
-			renderPass();
-			//testRenderPath();
-			//glUseProgram(0); // Unbinds the shader
+			forwardRendering();
+			//deferredRendering();
 
 			// OpenGL has two buffers/frames
 			// One the user sees, and the one that is being drawn
@@ -529,8 +542,8 @@ public:
 	}
 
 	void depthData() {
-		int width = directionalLight.getShadowMap()->getShadowWidth();
-		int height = directionalLight.getShadowMap()->getShadowHeight();
+		int width = directionalLight->getShadowMap()->getShadowWidth();
+		int height = directionalLight->getShadowMap()->getShadowHeight();
 
 		GLfloat *depthData = new GLfloat[width * height];
 		glReadPixels(0, 0, width, height, GL_DEPTH_COMPONENT,

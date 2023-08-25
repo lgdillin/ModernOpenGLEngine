@@ -69,6 +69,9 @@
     <ClCompile Include="Skybox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -158,6 +161,9 @@
     <ClInclude Include="WorldLoader.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="GBuffer.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -227,6 +233,18 @@
       <Filter>Resource Files</Filter>
     </None>
     <None Include="skyboxShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="DRgeom.vert">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="DRgeom.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="DRlighting.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="DRlighting.vert">
       <Filter>Resource Files</Filter>
     </None>
   </ItemGroup>

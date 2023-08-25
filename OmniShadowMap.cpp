@@ -62,9 +62,10 @@ void OmniShadowMap::bindToFrameBuffer() {
 
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "OmniShadowMap::bindToFrameBuffer() error "
-			<< error << " can't bind to framebuffer: " 
-			<< m_frameBufferObject << std::endl;
+		std::cout << "OmniShadowMap::bindToFrameBuffer() error: "
+			<< error << " can't bind to framebuffer id: " 
+			<< m_frameBufferObject<< " with frameBufferStatus: " 
+			<< framebufferStatus << std::endl;
 	}
 
 	glViewport(0, 0, m_width, m_height);

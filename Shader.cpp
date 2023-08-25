@@ -1,5 +1,13 @@
 #include "Shader.hpp"
 
+void errorReporter(std::string errorLocationPrefix) {
+	GLenum error = glGetError();
+	if (error != GL_NO_ERROR) {
+		std::cout << errorLocationPrefix << " " 
+			<< error << std::endl;
+	}
+}
+
 Shader::Shader() {
 	shaderId = 0;
 	uniformModel = 0;
@@ -106,6 +114,18 @@ void Shader::createFromString(
 	compileShader(vertexCode, fragmentCode);
 }
 
+void Shader::setVec3(std::string _glslCode, glm::vec3 _vec3) {
+	GLuint uniformLocation = glGetUniformLocation(shaderId,
+		_glslCode.c_str());
+	glUniform3f(uniformLocation, _vec3.x, _vec3.y, _vec3.z);
+}
+
+void Shader::setFloat(std::string _glslCode, float _float) {
+	GLuint uniformLocation = glGetUniformLocation(shaderId,
+		_glslCode.c_str());
+	glUniform1f(uniformLocation, _float);
+}
+
 void Shader::validate() {
 	// Get the error codes from the creation of the shaders
 	GLint result = 0;
@@ -119,60 +139,6 @@ void Shader::validate() {
 		std::cout << "Shader::validate() error: " << errorLog << std::endl;
 		return;
 	}
-}
-
-GLuint Shader::getModelLocation() {
-	return uniformModel;
-}
-
-GLuint Shader::getProjectionLocation() {
-	return uniformProjection;
-}
-
-GLuint Shader::getViewLocation() {
-	return uniformView;
-}
-
-GLuint Shader::getAmbientIntensityLocation() {
-	return uniformDirectionalLight.uniformAmbientIntensity;
-}
-
-GLuint Shader::getColorLocation() {
-	return uniformDirectionalLight.uniformColor;
-}
-
-GLuint Shader::getDiffuseIntensity() {
-	return uniformDirectionalLight.uniformDiffuseIntensity;
-}
-
-
-GLuint Shader::getDirectionLocation() {
-	return uniformDirectionalLight.uniformDirection;
-}
-
-GLuint Shader::getSpecularIntensityLocation() {
-	return uniformSpecularIntensity;
-}
-
-GLuint Shader::getShininessLocation() {
-	return uniformShininess;
-}
-
-GLuint Shader::getEyePositionLocation() {
-	return uniformEyePosition;
-}
-
-GLuint Shader::getOmniLightPositionLocation() {
-	return uniformOmniLightPosition;
-}
-
-GLuint Shader::getFarPlaneLocation() {
-	return uniformFarPlane;
-}
-
-// Not used
-GLuint Shader::getScaleMatrixLocation() {
-	return uniformScaleMatrix;
 }
 
 void Shader::setDirectionalLight(DirectionalLight *dLight) {
@@ -356,6 +322,12 @@ void Shader::compileShader(std::string vertexCode, std::string geometryCode, std
 	compileProgram();
 }
 
+void Shader::compileLights() {
+	for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
+
+	}
+}
+
 void Shader::compileProgram() {
 	// Get the error codes from the creation of the shaders
 	GLint result = 0;
@@ -384,15 +356,21 @@ void Shader::compileProgram() {
 	// 2. search the program for the xMovement uniform variable
 	// We want the id of the location of the uniform variable in the program
 	uniformModel = glGetUniformLocation(shaderId, "model");
-	uniformProjection = glGetUniformLocation(shaderId, "projection");
-
-	uniformView = glGetUniformLocation(shaderId, "view");
-	uniformScaleMatrix = glGetUniformLocation(shaderId, "scaleMatrix");
-
 	GLenum error = glGetError();
 	if (error != GL_NO_ERROR) {
-		std::cout << "Error binding matrix uniforms " << error << std::endl;
+		std::cout << "model error "
+			<< error << std::endl;
 	}
+	errorReporter("Shader::compileProgram() u_model");
+
+	uniformProjection = glGetUniformLocation(shaderId, "projection");
+	errorReporter("Shader::compileProgram() u_projection");
+
+	uniformView = glGetUniformLocation(shaderId, "view");
+	errorReporter("Shader::compileProgram() u_view");
+
+	uniformScaleMatrix = glGetUniformLocation(shaderId, "scaleMatrix");
+	errorReporter("Shader::compileProgram() scaleMatrix");
 
 	// Configuration the uniforms for the Directional Light
 	uniformDirectionalLight.uniformColor = glGetUniformLocation(shaderId,
@@ -406,12 +384,7 @@ void Shader::compileProgram() {
 
 	uniformDirectionalLight.uniformDiffuseIntensity = glGetUniformLocation(shaderId,
 		"directionalLight.basicLight.diffuseIntensity");
-
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Shader::CompileProgram() binding directional light " 
-			<< error << std::endl;
-	}
+	errorReporter("Shader::CompileProgram() binding directional light");
 
 	//uniformColor = glGetUniformLocation(shader, "newColor");
 	uniformSpecularIntensity = glGetUniformLocation(shaderId,
@@ -427,10 +400,7 @@ void Shader::compileProgram() {
 	uniformSpotLightCount = glGetUniformLocation(shaderId,
 		"spotLightCount");
 
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Shader::CompileProgram() binding light counts " << error << std::endl;
-	}
+	errorReporter("Shader::CompileProgram() binding light counts");
 
 	// For the point lights
 	for (int i = 0; i < MAX_POINT_LIGHTS; ++i) {
@@ -467,10 +437,7 @@ void Shader::compileProgram() {
 		uniformPointLight[i].uniformQuadratic = glGetUniformLocation(shaderId, locationBuffer);
 	}
 
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Shader::CompileProgram() binding pointLight attr. " << error << std::endl;
-	}
+	errorReporter("Shader::CompileProgram() binding pointLight attr");
 
 	// For the spot lights
 	for (int i = 0; i < MAX_SPOT_LIGHTS; ++i) {
@@ -513,10 +480,7 @@ void Shader::compileProgram() {
 		uniformSpotLight[i].uniformEdge = glGetUniformLocation(shaderId, locationBuffer);
 	}
 
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Shader::CompileProgram() binding spotLight attr. " << error << std::endl;
-	}
+	errorReporter("Shader::CompileProgram() binding spotLight attr.");
 
 	uniformTexture = glGetUniformLocation(shaderId, "diffuseTexture");
 
@@ -525,20 +489,13 @@ void Shader::compileProgram() {
 	uniformDirectionalShadowMap = glGetUniformLocation(shaderId,
 		"directionalShadowMap");
 
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Error binding shadow map " << error << std::endl;
-	}
+	errorReporter("Shader::CompileProgram() Error binding shadow map");
 
 	uniformOmniLightPosition = glGetUniformLocation(shaderId,
 		"lightPosition");
 	uniformFarPlane = glGetUniformLocation(shaderId,
 		"farPlane");
 
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Error binding shadow map " << error << std::endl;
-	}
 
 	for (int i = 0; i < 6; ++i) {
 		char locationBuffer[99] = { '\0' };
@@ -549,11 +506,7 @@ void Shader::compileProgram() {
 			locationBuffer);
 	}
 
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Shader::CompileProgram() at binding lightMatrices[] " 
-			<< error << std::endl;
-	}
+	errorReporter("Shader::CompileProgram() at binding lightMatrices[]");
 
 	for (int i = 0; i < MAX_POINT_LIGHTS + MAX_SPOT_LIGHTS; ++i) {
 		char locationBuffer[99] = { '\0' };
@@ -569,11 +522,7 @@ void Shader::compileProgram() {
 			locationBuffer);
 	}
 
-	error = glGetError();
-	if (error != GL_NO_ERROR) {
-		std::cout << "Shader::CompileProgram() at binding uniformOmniShadowMap[] "
-			<< error << std::endl;
-	}
+	errorReporter("Shader::CompileProgram() at binding uniformOmniShadowMap[]");
 }
 
 void Shader::addShader(

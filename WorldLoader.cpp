@@ -153,6 +153,13 @@ void WorldLoader::loadShaders() {
 	std::string gShader2 = "omniShadowMap.geom";
 	std::string fShader2 = "omniShadowMap.frag";
 
+	// shaders for deferred rendering
+	std::string dr_vshader = "DRgeom.vert";
+	std::string dr_fshader = "DRgeom.frag";
+
+	std::string dr_vshaderL = "DRlighting.vert";
+	std::string dr_fshaderL = "DRlighting.frag";
+
 	Shader *shader1 = new Shader();
 	shader1->createFromFile(vShader, fShader);
 	WorldLoader::m_shaders.push_back(shader1);
@@ -164,6 +171,14 @@ void WorldLoader::loadShaders() {
 	Shader *shader3 = new Shader();
 	shader3->createFromFile(vShader2, gShader2, fShader2);
 	WorldLoader::m_shaders.push_back(shader3);
+
+	//Shader *shader4 = new Shader();
+	//shader4->createFromFile(dr_vshader, dr_fshader);
+	//WorldLoader::m_shaders.push_back(shader4);
+
+	//Shader *shader5 = new Shader();
+	//shader5->createFromFile(dr_vshaderL, dr_fshaderL);
+	//WorldLoader::m_shaders.push_back(shader5);
 }
 
 void WorldLoader::loadMeshGroups() {

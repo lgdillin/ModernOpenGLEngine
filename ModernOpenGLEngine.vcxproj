@@ -136,6 +136,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="DirectionalLight.cpp" />
+    <ClCompile Include="GBuffer.cpp" />
     <ClCompile Include="GlfwCamera.hpp" />
     <ClCompile Include="Light.cpp" />
     <ClCompile Include="main.cpp" />
@@ -160,6 +161,7 @@
     <ClInclude Include="CameraBall.hpp" />
     <ClInclude Include="DirectionalLight.hpp" />
     <ClInclude Include="Entity.hpp" />
+    <ClInclude Include="GBuffer.hpp" />
     <ClInclude Include="GlfwGame.hpp" />
     <ClInclude Include="GlfwWindow.hpp" />
     <ClInclude Include="Light.hpp" />
@@ -187,6 +189,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="CameraAndUserInput.md" />
+    <None Include="DRgeom.frag" />
+    <None Include="DRgeom.vert" />
+    <None Include="DRlighting.frag" />
+    <None Include="DRlighting.vert" />
     <None Include="OmnidirectionalShadowsCubeMapsGeomShader.md" />
     <None Include="omniShadowMap.frag" />
     <None Include="omniShadowMap.geom" />
