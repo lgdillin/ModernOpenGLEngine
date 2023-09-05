@@ -72,6 +72,9 @@
     <ClCompile Include="GBuffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Quad.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -164,6 +167,9 @@
     <ClInclude Include="GBuffer.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Quad.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -247,5 +253,6 @@
     <None Include="DRlighting.vert">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="DRlighting1.frag" />
   </ItemGroup>
 </Project>

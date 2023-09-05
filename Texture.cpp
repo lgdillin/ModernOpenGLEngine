@@ -65,14 +65,14 @@ void Texture::useTextureDebug(GLuint id) {
 }
 
 
-void Texture::useTexture() {
+void Texture::useTexture(GLenum _textureUnit) {
 	// GL_TEXTURE0 is what is called a texture unit
 	// When our texture is being run in the frag shader, there will be
 	// a sampler. the sampler is what will have access to the data of our 
 	// texture, but will be accessing it through our unit.
 	// There is a required minimum number of 16 texture units for a 
 	// modern GPU, but many GPUs have more
-	glActiveTexture(GL_TEXTURE1);
+	glActiveTexture(_textureUnit);
 	// binds textureId to GL_TEXTURE0
 	glBindTexture(GL_TEXTURE_2D, textureId);
 

@@ -27,6 +27,8 @@ void main() {
 	vec3 gDiffuse = texture(u_gAlbedoSpecular, v_out_texCoords).rgb;
 	float gSpecular = texture(u_gAlbedoSpecular, v_out_texCoords).a;
 
+	//gDiffuse = (gDiffuse * 0.5) + 0.5;
+
 	// then calculate lighting as usual 
 	vec3 lighting = gDiffuse * 0.1; // hard-coded ambient component.
 	vec3 viewDir = normalize(u_viewPos - gFragPosition);
@@ -40,7 +42,7 @@ void main() {
 
 		// Specular 
 		vec3 halfwayDir = normalize(lightDir + viewDir);
-		float specMultiplier = pow(max(dot(gNormal, halfwayDir), 0.0), 16.0);
+		float specMultiplier = pow(max(dot(gNormal, halfwayDir), 0.0), 64.0);
 		vec3 specular = specMultiplier * u_lights[i].color * gSpecular;
 
 		// attenuation 
@@ -51,10 +53,14 @@ void main() {
 			+ u_lights[i].quadratic * dist * dist // quadratic factor
 		);
 
-		diffuse *= attenuation;
+		diffuse *= attenuation * 1.2;
 		specular *= attenuation;
 		lighting += diffuse + specular;
 	}
 
+	//f_out_fragColor = texture(u_gAlbedoSpecular, v_out_texCoords) * vec4(lighting, 0.0);
 	f_out_fragColor = vec4(lighting, 1.0);
+
+	//gl_FragDepth = length(gFragPosition.xyz - u_lights[0].position) / 500.0;
+	//f_out_fragColor = vec4(0.0, 0.0, 1.0, 1.0);
 }

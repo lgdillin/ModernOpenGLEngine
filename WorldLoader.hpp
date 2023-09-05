@@ -50,7 +50,8 @@ public:
 		glm::vec3 translation,
 		float rotationAngle,
 		glm::vec3 rotVector,
-		glm::vec3 scale
+		glm::vec3 scale,
+		Texture *lightMap
 	);
 
 	static void loadBrushes();

@@ -101,7 +101,7 @@ Vectors, Matrices, and Uniform Variables in OpenGL
 	- Each uniform has a location ID in the shader
 	- Need to find the location so we can bind a value to it
 	- Example:
-		int location = glGetUniformLocation(shaderID, "uniformVarName");
+		int location = glGetUniformLocation(m_shaderId, "uniformVarName");
 
 	- Now we can bind a value to that location:
 		glUniform1f(location, 3.5f);

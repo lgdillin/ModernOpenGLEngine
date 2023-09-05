@@ -110,13 +110,16 @@ bool GBuffer::init2(unsigned int _windowWidth, unsigned int _windowHeight) {
 		GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2 };
 	glDrawBuffers(3, attachments);
 
+
 	// create and attach depth buffer (renderbuffer)
 	glGenRenderbuffers(1, &m_renderDepthBuffer);
 	glBindRenderbuffer(GL_RENDERBUFFER, m_renderDepthBuffer);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT,
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32F,
 		_windowWidth, _windowHeight);
 	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 		GL_RENDERBUFFER, m_renderDepthBuffer);
+
+
 
 	// check for completeness/errors
 	GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
@@ -124,6 +127,7 @@ bool GBuffer::init2(unsigned int _windowWidth, unsigned int _windowHeight) {
 		std::cout << "GBuffer::init2() failed with error: " << status << std::endl;
 		return false;
 	}
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void GBuffer::bindForWriting() {

@@ -11,6 +11,7 @@
 
 #include "Mesh.hpp"
 #include "Texture.hpp"
+#include "Shader.hpp"
 
 // Class to generate an object that starts as a cube, but can be 
 // modified to fit 
@@ -50,11 +51,15 @@ public:
 
 	Mesh* getMesh() { return mesh; }
 	void renderMesh() { mesh->renderMesh(); }
+	void draw(Shader &_shader);
 
 	Texture* getTexture() { return texture; }
 	void setTexture(Texture *_texture) { 
-		delete texture;
+		//delete texture;
 		texture = _texture; 
+	}
+	void setSpecularMap(Texture *_map) {
+		m_specularMap = _map;
 	}
 
 	glm::vec3 getBBVertex(int index);
@@ -130,6 +135,7 @@ private:
 	Mesh* mesh;
 
 	Texture* texture;
+	Texture *m_specularMap;
 
 	glm::mat4 model, scale;
 

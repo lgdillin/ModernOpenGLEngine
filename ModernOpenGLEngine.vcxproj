@@ -145,6 +145,7 @@
     <ClCompile Include="MeshGroup.cpp" />
     <ClCompile Include="OmniShadowMap.cpp" />
     <ClCompile Include="PointLight.cpp" />
+    <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RectangularPrism.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
@@ -175,6 +176,7 @@
     <ClInclude Include="PhysicsModel.hpp" />
     <ClInclude Include="Player.hpp" />
     <ClInclude Include="PointLight.hpp" />
+    <ClInclude Include="Quad.hpp" />
     <ClInclude Include="RectangularPrism.hpp" />
     <ClInclude Include="SdlWindow.hpp" />
     <ClInclude Include="Shader.hpp" />
@@ -193,6 +195,7 @@
     <None Include="DRgeom.vert" />
     <None Include="DRlighting.frag" />
     <None Include="DRlighting.vert" />
+    <None Include="DRlighting1.frag" />
     <None Include="OmnidirectionalShadowsCubeMapsGeomShader.md" />
     <None Include="omniShadowMap.frag" />
     <None Include="omniShadowMap.geom" />

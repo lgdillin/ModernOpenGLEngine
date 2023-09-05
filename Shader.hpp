@@ -18,16 +18,28 @@
 
 class Shader {
 public:
+	enum SHADING_MODE {
+		FOWARD_SHADING,
+		DEFERRED_SHADING
+	};
+
 	Shader();
 	~Shader();
 
-	void createFromFile(std::string vFile, std::string fFile);
-	void createFromFile(std::string vFile, std::string gFile, std::string fFile);
+	void createFromFile(std::string vFile, std::string fFile, 
+		SHADING_MODE _mode);
+	void createFromFile(std::string vFile, std::string gFile, 
+		std::string fFile, SHADING_MODE _mode);
 
 	void createFromString(std::string vertexCode, std::string fragmentCode);
 
+	void setMat4(std::string _glslCode, glm::mat4 _mat4);
 	void setVec3(std::string _glslCode, glm::vec3 _vec3);
 	void setFloat(std::string _glslCode, float _float);
+	void setTexture(std::string _glslCode, GLenum _textureUnit);
+
+	void setProjectionMatrix(glm::mat4 _mat4);
+	void setViewMatrix(glm::mat4 _mat4);
 
 	void validate();
 
@@ -43,11 +55,12 @@ public:
 	void setDirectionalShadowMap(GLuint textureUnit);
 	void setDirectionalLightTransform(glm::mat4 transform);
 	void setLightMatrices(std::vector<glm::mat4> lightMatrices);
+	void setInt(std::string _name, int _value);
 
 	void useShader();
 	void clearShader();
 
-	GLuint getShaderId() { return shaderId; }
+	GLuint getM_shaderId() { return m_shaderId; }
 	GLuint getModelLocation() { return uniformModel; }
 	GLuint getProjectionLocation() { return uniformProjection; }
 	GLuint getViewLocation() { return uniformView; }
@@ -113,9 +126,16 @@ private:
 		std::string fragmentCode
 	);
 
+	void compileDeferredShader(
+		std::string vertexCode,
+		std::string fragmentCode
+	);
+
 	void compileLights();
 
 	void compileProgram();
+
+	void compileDeferredProgram();
 
 	void addShader(
 		GLuint programId, 
@@ -126,7 +146,7 @@ private:
 	int pointLightCount, spotLightCount;
 
 	GLuint
-		shaderId,
+		m_shaderId,
 		uniformProjection,
 		uniformModel,
 		uniformView,
@@ -147,4 +167,10 @@ private:
 		uniformFarPlane,
 		uniformLightMatrices[6];
 
+	// Deferred only stuff for now
+	GLuint m_uDiffuseTexture;
+	GLuint m_uSpecularTexture;
+	GLuint m_uGPosition;
+	GLuint m_uGNormal;
+	GLuint m_uGAlbedoSpecular;
 };

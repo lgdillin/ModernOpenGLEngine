@@ -241,9 +241,9 @@ RENDERING THEORY/PIPELINE
 
 	== Using a Shader Program
 		- When you create a shader, an ID is generated (like with VAOs/VBOs)
-		- Simply call glUseProgram(shaderID)
+		- Simply call glUseProgram(m_shaderId)
 		- All draw calls from then on will use that shader, glUseProgram
-		is used on a new shaderID, or on '0' (meaning 'no shader') as a safety
+		is used on a new m_shaderId, or on '0' (meaning 'no shader') as a safety
 
 	== Summary:
 		- Rendering Pipeline consists of several stages

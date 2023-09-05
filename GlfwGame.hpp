@@ -28,6 +28,7 @@
 #include "SpotLight.hpp"
 #include "MeshGroup.hpp"
 #include "Skybox.hpp"
+#include "Quad.hpp"
 
 #include "GBuffer.hpp"
 
@@ -93,9 +94,11 @@ private:
 	Shader *directionalShadowShader, shadowPass;
 	Shader *dr_shaderGeomPass, *dr_shaderLightPass;
 	RectangularPrism *prismPtr;
+	RectangularPrism *prismPtr2;
 
 	float incrementArgument;
 	WorldLoader worldLoader;
+	Quad screenQuad;
 public:
 	GlfwGame() {
 		shaders = std::vector<Shader*>();
@@ -137,20 +140,24 @@ public:
 		pointLights = WorldLoader::m_pointLights;
 		skybox = WorldLoader::m_skybox;
 		shaders = WorldLoader::m_shaders;
-		//dr_shaderGeomPass = shaders[3];
-		//dr_shaderLightPass = shaders[4];
+		dr_shaderGeomPass = shaders[3];
+		dr_shaderLightPass = shaders[4];
 
-		glfwCamera = GlfwCamera();
+		glfwCamera = GlfwCamera(glm::vec3(0.0f, 5.0f, 15.0f));
 
 		shinyMaterial = WorldLoader::m_materials[0];
 		dullMaterial = WorldLoader::m_materials[1];
 		superShinyMaterial = WorldLoader::m_materials[2];
 
 		cat = WorldLoader::m_meshGroups[0];
-		prismPtr = &prisms[0];
+		prismPtr = &prisms[5];
+		prismPtr2 = &prisms[33];
 
-		//gBuffer = GBuffer();
-		//gBuffer.init(glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight());
+		gBuffer = GBuffer();
+		gBuffer.init2(glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight());
+
+		screenQuad = Quad();
+		screenQuad.initialize(glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight());
 	}
 
 	void renderCat() {
@@ -186,7 +193,7 @@ public:
 		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
 			glm::value_ptr(glfwCamera.calculateViewMatrix()));
 		int i = 0;
-		glm::mat4 model1 = glm::mat4(1);
+		//glm::mat4 model1 = glm::mat4(1);
 		for (auto &prism : prisms) {
 			prism.transform();
 
@@ -378,94 +385,50 @@ public:
 		renderPass();
 	}
 	
-	void deferredRenderingLighting() {
-		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		glEnable(GL_BLEND);
-		glBlendEquation(GL_FUNC_ADD);
-		glBlendFunc(GL_ONE, GL_ONE);
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		gBuffer.bindForReading();
-
-		// directional light
-
-		// point lights
-		glUniform3f(uniformEyePosition,
-			glfwCamera.getCameraPosition().x,
-			glfwCamera.getCameraPosition().y,
-			glfwCamera.getCameraPosition().z);
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
-			glm::value_ptr(glfwWindow->getProjection()));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
-			glm::value_ptr(glfwCamera.calculateViewMatrix()));
-
-		shaders[1]->useShader();
-
-		uniformModel = shaders[1]->getModelLocation();
-		lightTransform = directionalLight->calculateLightTransform();
-		shaders[1]->setDirectionalLightTransform(
-			lightTransform);
-		shaders[1]->validate();
-
-	}
-
-	void deferredRenderingGeometry() {
-
-		gBuffer.bindForWriting();
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// render the first prism and thats it
-
-		glUniform3f(uniformEyePosition,
-			glfwCamera.getCameraPosition().x,
-			glfwCamera.getCameraPosition().y,
-			glfwCamera.getCameraPosition().z);
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
-			glm::value_ptr(glfwWindow->getProjection()));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
-			glm::value_ptr(glfwCamera.calculateViewMatrix()));
-
-		auto &prism = prisms[0];
-		prism.transform();
-		glUniformMatrix4fv(uniformModel, 1, GL_FALSE,
-			glm::value_ptr(prism.getModelMatrix()));
-		glUniformMatrix4fv(uniformScaleMatrix, 1, GL_FALSE,
-			glm::value_ptr(prism.scaleTexture()));
-
-		//prism.getTexture()->useTexture();
-		//superShinyMaterial.useMaterial(uniformSpecularIntensity, uniformShininess);
-		prism.renderMesh();
-	}
 
 	void deferredRendering() {
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		
+
+		glEnable(GL_DEPTH_TEST);
+		glDisable(GL_BLEND);
+		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer.getGBufferObject());
+		//glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glBindFramebuffer(GL_FRAMEBUFFER, gBuffer.getGBufferObject());
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		// 1. Geometry Pass
 		//////////////////////////
-		glUniform3f(uniformEyePosition,
-			glfwCamera.getCameraPosition().x,
-			glfwCamera.getCameraPosition().y,
-			glfwCamera.getCameraPosition().z);
-		glUniformMatrix4fv(uniformProjection, 1, GL_FALSE,
-			glm::value_ptr(glfwWindow->getProjection()));
-		glUniformMatrix4fv(uniformView, 1, GL_FALSE,
-			glm::value_ptr(glfwCamera.calculateViewMatrix()));
-
 		dr_shaderGeomPass->useShader(); // Shader for the gBuffer (think shadowmap)
-		prismPtr->renderMesh();
 
+		dr_shaderGeomPass->setMat4("u_projection", glfwWindow->getProjection());
+		dr_shaderGeomPass->setMat4("u_view", glfwCamera.calculateViewMatrix());
+
+		//prismPtr->transform();
+		//dr_shaderGeomPass->setMat4("u_model", prismPtr->getModelMatrix());
+		//prismPtr->draw(*dr_shaderGeomPass);
+
+		//prismPtr2->transform();
+		//dr_shaderGeomPass->setMat4("u_model", prismPtr2->getModelMatrix());
+		//prismPtr2->draw(*dr_shaderGeomPass);
+
+		for (auto &prism : prisms) {
+			prism.transform();
+			dr_shaderGeomPass->setMat4("u_model", prism.getModelMatrix());
+			prism.draw(*dr_shaderGeomPass);
+		}
+
+
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		glEnable(GL_BLEND);
+		
 		// 2. Lighting pass
 		//////////////////////////
-		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		// activate lighting pass shader
-		// shaderlightpass.use();
+		//// activate lighting pass shader
 		dr_shaderLightPass->useShader();
+		dr_shaderLightPass->setInt("u_gPosition", 0);
+		dr_shaderLightPass->setInt("u_gNormal", 1);
+		dr_shaderLightPass->setInt("u_gAlbedoSpecular", 2);
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gBuffer.getGPosition());
 
@@ -475,33 +438,33 @@ public:
 		glActiveTexture(GL_TEXTURE2);
 		glBindTexture(GL_TEXTURE_2D, gBuffer.getGAlbedoSpecular());
 
-		// add in the lighting loop
-		dr_shaderLightPass->setVec3("lights[" + std::to_string(0)
-			+ "].position", glm::vec3(0.0f));
-		dr_shaderLightPass->setVec3("lights[" + std::to_string(0)
-			+ "].color", glm::vec3(1.0f));
-		dr_shaderLightPass->setFloat("lights[" + std::to_string(0)
-			+ "].linear", 0.7f);
-		dr_shaderLightPass->setFloat("lights[" + std::to_string(0)
-			+ "].quadratic", 1.8f);
-		dr_shaderLightPass->setVec3("viewPos",
-			glfwCamera.getCameraPosition());
+		//// add in the lighting loop
+		dr_shaderLightPass->setVec3("u_lights[0].position", glm::vec3(1.5f, 3.0f, 0.0f));
+		dr_shaderLightPass->setVec3("u_lights[0].color", glm::vec3(1.0f, 1.0f, 1.0f));
+		dr_shaderLightPass->setFloat("u_lights[0].linear", 0.1f);
+		dr_shaderLightPass->setFloat("u_lights[0].quadratic", 0.5f);
+		dr_shaderLightPass->setVec3("u_viewPos", glfwCamera.getCameraPosition());
+		screenQuad.render();
+
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		
 
 		// 2.5 copy content of geometry's depth buffer to default framebuffer's
 		// depth buffer
 		/////////////////////
-		glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer.getGBufferObject());
-		glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+		//glBindFramebuffer(GL_READ_FRAMEBUFFER, gBuffer.getGBufferObject());
+		//glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 
-		// blit to default framebuffer. note that this may or may not work as the
-		// internal formats of both the EBO and default framebuffer have ...
-		// the internal formats are implementation defined.
-		glBlitFramebuffer(0, 0, glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight(),
-			0, 0, glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight(),
-			GL_DEPTH_BUFFER_BIT, GL_NEAREST);
-
+		//// blit to default framebuffer. note that this may or may not work as the
+		//// internal formats of both the EBO and default framebuffer have ...
+		//// the internal formats are implementation defined.
+		//glBlitFramebuffer(0, 0, glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight(),
+		//	0, 0, glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight(),
+		//	GL_DEPTH_BUFFER_BIT, GL_NEAREST);
+		//glBindFramebuffer(GL_FRAMEBUFFER, 0);
+		//screenQuad.render();
 		// 3. render lights on top of scene
-		// shader light box.use()
+		//prismPtr->renderMesh();
 	}
 
 	void runGame() {
@@ -528,8 +491,8 @@ public:
 				glfwWindow->getMouseDeltaY());
 
 
-			forwardRendering();
-			//deferredRendering();
+			//forwardRendering();
+			deferredRendering();
 
 			// OpenGL has two buffers/frames
 			// One the user sees, and the one that is being drawn

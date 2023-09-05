@@ -175,6 +175,27 @@ void RectangularPrism::computeInterpolatedNormalsSmoothEdges() {
 	}
 }
 
+void RectangularPrism::draw(Shader &_shader) {
+	// assign active texture
+	unsigned int textureUnitOffset = 1;
+	//glActiveTexture(GL_TEXTURE0 + textureUnitOffset);
+
+	// assign texture type (currently hardcoded)
+	glActiveTexture(GL_TEXTURE0);
+	glUniform1i(glGetUniformLocation(_shader.getM_shaderId(),
+		"texture_diffuse1"), 0);
+	glBindTexture(GL_TEXTURE_2D, texture->getTextureId());
+
+	glActiveTexture(GL_TEXTURE1);
+	glUniform1i(glGetUniformLocation(_shader.getM_shaderId(),
+		"texture_specular1"), 1);
+	glBindTexture(GL_TEXTURE_2D, m_specularMap->getTextureId());
+
+	renderMesh();
+
+	glActiveTexture(GL_TEXTURE0);
+}
+
 glm::vec3 RectangularPrism::getBBVertex(int index) {
 	return glm::vec3(
 		boundingBox[3 * index],

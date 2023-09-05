@@ -15,9 +15,11 @@ uniform sampler2D texture_specular1;
 void main()
 {
 	// store the fragment position vector in the first gBuffer texture 
+	//gPosition = (v_out_fragPos * 0.5) + 0.5;
 	gPosition = v_out_fragPos;
 
 	// Also store the per-fragment normals into the gBuffer 
+	//gNormal = normalize((v_out_normals * 0.5) + 0.5);
 	gNormal = normalize(v_out_normals);
 
 	// as well as the per-fragment diffuse color 
@@ -25,4 +27,6 @@ void main()
 
 	// store specular intensity in gAlbedoSpecular's alpha component 
 	gAlbedoSpecular.a = texture(texture_specular1, v_out_texCoords).r;
+
+	//gl_FragDepth = length(v_out_fragPos.xyz - u_lights[0].position) / 500.0;
 }

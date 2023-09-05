@@ -11,10 +11,11 @@ public:
 	~Texture();
 
 	bool loadTextureAlphaOption(bool alphaMode);
-	void useTexture();
+	void useTexture(GLenum _textureUnit = GL_TEXTURE1);
 	void useTextureDebug(GLuint id);
 	void clearTexture();
 
+	GLuint getTextureId() { return textureId; }
 
 protected:
 	int width, height, bitDepth;
