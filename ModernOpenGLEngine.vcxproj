@@ -147,6 +147,8 @@
     <ClCompile Include="PointLight.cpp" />
     <ClCompile Include="Quad.cpp" />
     <ClCompile Include="RectangularPrism.cpp" />
+    <ClCompile Include="RectangularPrismBuilder.cpp" />
+    <ClCompile Include="RectPrism.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="ShadowMap.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -178,6 +180,9 @@
     <ClInclude Include="PointLight.hpp" />
     <ClInclude Include="Quad.hpp" />
     <ClInclude Include="RectangularPrism.hpp" />
+    <ClInclude Include="RectangularPrismBuilder.hpp" />
+    <ClInclude Include="RectPrism.hpp" />
+    <ClInclude Include="rpInstance.hpp" />
     <ClInclude Include="SdlWindow.hpp" />
     <ClInclude Include="Shader.hpp" />
     <ClInclude Include="ShadowMap.hpp" />
@@ -190,6 +195,8 @@
     <ClInclude Include="WorldLoader.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="basicShader.frag" />
+    <None Include="basicShader.vert" />
     <None Include="CameraAndUserInput.md" />
     <None Include="DRgeom.frag" />
     <None Include="DRgeom.vert" />

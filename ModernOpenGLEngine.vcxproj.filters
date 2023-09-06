@@ -75,6 +75,12 @@
     <ClCompile Include="Quad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="RectangularPrismBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RectPrism.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="SdlWindow.hpp">
@@ -170,6 +176,15 @@
     <ClInclude Include="Quad.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RectangularPrismBuilder.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="RectPrism.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="rpInstance.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="VectorsMatricesUniformVariables.md">
@@ -253,6 +268,10 @@
     <None Include="DRlighting.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="DRlighting1.frag" />
+    <None Include="basicShader.vert" />
+    <None Include="DRlighting1.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="basicShader.frag" />
   </ItemGroup>
 </Project>

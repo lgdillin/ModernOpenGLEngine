@@ -132,6 +132,12 @@ void WorldLoader::loadTextures() {
 
 	WorldLoader::m_textures.push_back(new Texture("resources/box_specular.png"));
 	WorldLoader::m_textures[6]->loadTextureAlphaOption(true);
+
+	WorldLoader::m_textures.push_back(new Texture("resources/brick_specular.png"));
+	WorldLoader::m_textures[7]->loadTextureAlphaOption(true);
+
+	WorldLoader::m_textures.push_back(new Texture("resources/grass_specular.png"));
+	WorldLoader::m_textures[8]->loadTextureAlphaOption(true);
 }
 
 void WorldLoader::loadMaterials() {
@@ -163,16 +169,19 @@ void WorldLoader::loadShaders() {
 	std::string dr_vshaderL = "DRlighting.vert";
 	std::string dr_fshaderL = "DRlighting.frag";
 
+	std::string basicShaderV = "basicShader.vert";
+	std::string basicShaderF = "basicShader.frag";
+
 	Shader *shader1 = new Shader();
-	shader1->createFromFile(vShader, fShader, Shader::FOWARD_SHADING);
+	shader1->createFromFile(vShader, fShader, Shader::FORWARD_SHADING);
 	WorldLoader::m_shaders.push_back(shader1);
 
 	Shader *shader2 = new Shader();
-	shader2->createFromFile(vShader1, fShader1, Shader::FOWARD_SHADING);
+	shader2->createFromFile(vShader1, fShader1, Shader::FORWARD_SHADING);
 	WorldLoader::m_shaders.push_back(shader2);
 
 	Shader *shader3 = new Shader();
-	shader3->createFromFile(vShader2, gShader2, fShader2, Shader::FOWARD_SHADING);
+	shader3->createFromFile(vShader2, gShader2, fShader2, Shader::FORWARD_SHADING);
 	WorldLoader::m_shaders.push_back(shader3);
 
 	Shader *shader4 = new Shader();
@@ -182,6 +191,10 @@ void WorldLoader::loadShaders() {
 	Shader *shader5 = new Shader();
 	shader5->createFromFile(dr_vshaderL, dr_fshaderL, Shader::DEFERRED_SHADING);
 	WorldLoader::m_shaders.push_back(shader5);
+
+	Shader *shader6 = new Shader();
+	shader6->createFromFile(basicShaderV, basicShaderF, Shader::DEFERRED_SHADING);
+	WorldLoader::m_shaders.push_back(shader6);
 }
 
 void WorldLoader::loadMeshGroups() {
@@ -218,9 +231,13 @@ void WorldLoader::loadBrushes() {
 	Texture *grassTexture = m_textures[2];
 	Texture *boxTexture = m_textures[3];
 	Texture *rustTexture = m_textures[4];
+
 	Texture *plainTexture = m_textures[5];
-	Texture *boxSpecularMap = m_textures[6];
 	Texture *plainSpecularMap = m_textures[5];
+
+	Texture *boxSpecularMap = m_textures[6];
+	Texture *brickSpecularMap = m_textures[7];
+	Texture *grassSpecularMap = m_textures[8];
 
 	// cave box 1
 	addNewBrushS(
@@ -285,7 +302,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(10.0f, 10.0f, 1.0f),
-		plainSpecularMap);
+		grassSpecularMap);
 
 	// floor 2
 	addNewBrushS(
@@ -295,7 +312,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(10.0f, 10.0f, 1.0f),
-		plainSpecularMap);
+		grassSpecularMap);
 
 	// floor 3
 	addNewBrushS(
@@ -305,7 +322,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(10.0f, 10.0f, 1.0f),
-		plainSpecularMap);
+		grassSpecularMap);
 
 	// floor 4
 	addNewBrushS(
@@ -325,7 +342,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(1.0f, 0.0f, 0.0f),
 		glm::vec3(6.0f, 1.0f, 5.0f),
-		plainSpecularMap);
+		grassSpecularMap);
 
 	// ceiling 5 (alley)
 	addNewBrushS(
@@ -365,7 +382,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(1.0f, 5.0f, 7.5f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// right front wall cave
@@ -376,7 +393,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(1.0f, 5.0f, 7.5f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// back wall cave
@@ -387,7 +404,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(1.0f, 5.0f, 20.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// left wall cave
@@ -398,7 +415,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(18.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// right wall cave
@@ -409,7 +426,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(18.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 
@@ -431,7 +448,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(15.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// long left wall room 1
@@ -442,7 +459,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(20.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// back wall room 1
@@ -453,7 +470,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(8.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// far wall room 2
@@ -464,7 +481,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(12.5f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// right wall room 3
@@ -475,7 +492,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(10.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// left wall room 3
@@ -486,7 +503,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(2.5f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// door partition
@@ -497,7 +514,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(1.5f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// door partition
@@ -508,7 +525,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(1.5f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// house left door partition
@@ -519,7 +536,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(5.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// house right door partition
@@ -530,7 +547,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(5.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// house door header
@@ -541,7 +558,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(15.0f, 3.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// house back wall
@@ -552,7 +569,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(15.0f, 8.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// house left wall
@@ -563,7 +580,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(13.0f, 8.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// house right wall
@@ -574,7 +591,7 @@ void WorldLoader::loadBrushes() {
 		90.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(13.0f, 8.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// floating box at spawn
@@ -608,7 +625,7 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(5.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 
 	// right Wall alley
@@ -619,6 +636,6 @@ void WorldLoader::loadBrushes() {
 		0.0f,
 		glm::vec3(0.0f, 1.0f, 0.0f),
 		glm::vec3(5.0f, 5.0f, 1.0f),
-		plainSpecularMap
+		brickSpecularMap
 	);
 }

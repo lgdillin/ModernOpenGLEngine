@@ -19,7 +19,7 @@
 class Shader {
 public:
 	enum SHADING_MODE {
-		FOWARD_SHADING,
+		FORWARD_SHADING,
 		DEFERRED_SHADING
 	};
 

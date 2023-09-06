@@ -58,6 +58,8 @@ public:
 		//delete texture;
 		texture = _texture; 
 	}
+
+	Texture *getSpecularMap() { return m_specularMap; }
 	void setSpecularMap(Texture *_map) {
 		m_specularMap = _map;
 	}

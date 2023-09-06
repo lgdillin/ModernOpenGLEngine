@@ -10,7 +10,7 @@ Skybox::Skybox(std::vector<std::string> _faceLocations) {
 	m_skyboxShader->createFromFile(
 		"skyboxShader.vert",
 		"skyboxShader.frag",
-		Shader::FOWARD_SHADING
+		Shader::FORWARD_SHADING
 	);
 
 	m_uniformProjection = m_skyboxShader->getProjectionLocation();
@@ -109,7 +109,7 @@ Skybox::Skybox(std::string *_faceLocations, int _faces) {
 	m_skyboxShader->createFromFile(
 		"skyboxShader.vert",
 		"skyboxShader.frag",
-		Shader::FOWARD_SHADING
+		Shader::FORWARD_SHADING
 	);
 
 	m_uniformProjection = m_skyboxShader->getProjectionLocation();

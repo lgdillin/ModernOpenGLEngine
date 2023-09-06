@@ -58,7 +58,7 @@ void Shader::createFromFile(
 	}
 	fileStream.close();
 
-	if (_mode == FOWARD_SHADING) {
+	if (_mode == FORWARD_SHADING) {
 		compileShader(vFileContents, fFileContents);
 	} else if (_mode == DEFERRED_SHADING) {
 		compileDeferredShader(vFileContents, fFileContents);
@@ -115,7 +115,7 @@ void Shader::createFromFile(
 	}
 	fileStream.close();
 
-	if (_mode == FOWARD_SHADING) {
+	if (_mode == FORWARD_SHADING) {
 		compileShader(vFileContents, gFileContents, fFileContents);
 	} else if (_mode == DEFERRED_SHADING) {
 		//compileDeferredShader(vFileContents, fFileContents);
