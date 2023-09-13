@@ -4,6 +4,7 @@
 #include <cmath>
 #include <vector>
 
+#define GLFW_INCLUDE_VULKAN
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -101,6 +102,7 @@ public:
 		glfwTerminate();
 	}
 
+	GLFWwindow *getWindow() { return window; }
 	glm::mat4 getProjection() { return projection; }
 	GLint getBufferWidth() { return bufferWidth; }
 	GLint getBufferHeight() { return bufferHeight; }
@@ -128,6 +130,37 @@ public:
 
 	void resetViewport() {
 		glViewport(0, 0, bufferWidth, bufferHeight);
+	}
+
+	void initializeVulkan() {
+		if (!glfwInit()) {
+			printf("Error Initialising GLFW");
+			glfwTerminate();
+			return;
+		}
+
+		// GLFW_NO_API designates Vulkan as the API
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+		glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+
+		window = glfwCreateWindow(
+			windowWidth,
+			windowHeight,
+			"Vulkan Window",
+			nullptr,
+			nullptr
+		);
+
+		uint32_t count = 0;
+		vkEnumerateInstanceExtensionProperties(
+			nullptr,
+			&count,
+			nullptr
+		);
+
+		std::cout << "Extension count: " << count << std::endl;
+
+
 	}
 
 

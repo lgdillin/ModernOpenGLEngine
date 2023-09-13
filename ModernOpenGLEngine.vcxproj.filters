@@ -13,6 +13,12 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Header Files\Vulkan">
+      <UniqueIdentifier>{74fe6f30-7c52-4663-ae86-3cb5ac8693a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vulkan">
+      <UniqueIdentifier>{995f42cf-3359-40be-a167-684d820bcc21}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -80,6 +86,9 @@
     </ClCompile>
     <ClCompile Include="RectPrism.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanRendererGlfw.cpp">
+      <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -182,8 +191,20 @@
     <ClInclude Include="RectPrism.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="rpInstance.hpp">
+    <ClInclude Include="RpInstance.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanGlfwGameRunner.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanRendererGlfw.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanValidation.hpp">
+      <Filter>Header Files\Vulkan</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -268,10 +289,14 @@
     <None Include="DRlighting.vert">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="basicShader.vert" />
     <None Include="DRlighting1.frag">
       <Filter>Resource Files</Filter>
     </None>
-    <None Include="basicShader.frag" />
+    <None Include="basicShader.frag">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="basicShader.vert">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

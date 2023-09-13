@@ -3,6 +3,8 @@
 std::vector<RectangularPrism> WorldLoader::m_prisms 
 	= std::vector<RectangularPrism>();
 
+std::vector<RectPrism> WorldLoader::m_prisms2 = std::vector<RectPrism>();
+
 std::vector<Texture *> WorldLoader::m_textures = std::vector<Texture *>();
 
 std::vector<Material> WorldLoader::m_materials = std::vector<Material>();
@@ -23,7 +25,10 @@ void WorldLoader::load() {
 	WorldLoader::loadShaders();
 	WorldLoader::loadTextures();
 	WorldLoader::loadMaterials();
-	WorldLoader::loadBrushes();
+
+	//WorldLoader::loadBrushes();
+	WorldLoader::loadBrushes2();
+
 	WorldLoader::loadSkybox();
 	WorldLoader::loadDirectionalLights();
 	WorldLoader::loadPointLights();
@@ -138,6 +143,12 @@ void WorldLoader::loadTextures() {
 
 	WorldLoader::m_textures.push_back(new Texture("resources/grass_specular.png"));
 	WorldLoader::m_textures[8]->loadTextureAlphaOption(true);
+
+	WorldLoader::m_textures.push_back(new Texture("resources/dirt_specular.png"));
+	WorldLoader::m_textures[9]->loadTextureAlphaOption(true);
+
+	WorldLoader::m_textures.push_back(new Texture("resources/rusty_specular.png"));
+	WorldLoader::m_textures[10]->loadTextureAlphaOption(true);
 }
 
 void WorldLoader::loadMaterials() {
@@ -201,6 +212,396 @@ void WorldLoader::loadMeshGroups() {
 	MeshGroup cat = MeshGroup();
 	cat.load("resources/12221_Cat_v1_l3.obj");
 	WorldLoader::m_meshGroups.push_back(cat);
+}
+
+void WorldLoader::loadBrushes2() {
+	RectangularPrismBuilder::initialize();
+	RpInstance rpInstance = {};
+
+	Texture *brickTexture = m_textures[0];
+	Texture *dirtTexture = m_textures[1];
+	Texture *grassTexture = m_textures[2];
+	Texture *boxTexture = m_textures[3];
+
+	Texture *rustTexture = m_textures[4];
+	Texture *plainTexture = m_textures[5];
+
+	Texture *plainSpecularMap = m_textures[5];
+	Texture *boxSpecularMap = m_textures[6];
+	Texture *brickSpecularMap = m_textures[7];
+	Texture *grassSpecularMap = m_textures[8];
+	Texture *dirtSpecularMap = m_textures[9];
+	Texture *rustSpecularMap = m_textures[10];
+
+	rpInstance.m_description = "Cave box 1";
+	rpInstance.m_position = glm::vec3(36.0f, 3.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(0.6f, 0.6f, 0.6f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.1f, 0.5f);
+	rpInstance.m_rotationAngleRadians = glm::radians(45.0f);
+	rpInstance.m_diffuseTexture = plainTexture;
+	rpInstance.m_specularTexture = plainSpecularMap;
+	RectPrism rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Cave box 2";
+	rpInstance.m_position = glm::vec3(26.0f, 3.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(0.6f, 0.6f, 0.6f);
+	rpInstance.m_rotationAxis = glm::vec3(0.5f, 0.7f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = plainTexture;
+	rpInstance.m_specularTexture = plainSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Cave box 3";
+	rpInstance.m_position = glm::vec3(31.0f, 3.0f, 15.0f);
+	rpInstance.m_scale = glm::vec3(0.6f, 0.6f, 0.6f);
+	rpInstance.m_rotationAxis = glm::vec3(1.0f, 0.8f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(45.0f);
+	rpInstance.m_diffuseTexture = plainTexture;
+	rpInstance.m_specularTexture = plainSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Cave box 4";
+	rpInstance.m_position = glm::vec3(31.0f, 3.0f, 6.0f);
+	rpInstance.m_scale = glm::vec3(0.6f, 0.6f, 0.6f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.3f, 1.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(45.0f);
+	rpInstance.m_diffuseTexture = plainTexture;
+	rpInstance.m_specularTexture = plainSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Cave box 5";
+	rpInstance.m_position = glm::vec3(26.0f, 3.0f, 7.0f);
+	rpInstance.m_scale = glm::vec3(0.6f, 0.6f, 0.6f);
+	rpInstance.m_rotationAxis = glm::vec3(1.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(45.0f);
+	rpInstance.m_diffuseTexture = plainTexture;
+	rpInstance.m_specularTexture = plainSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Floor1 at center of spawn";
+	rpInstance.m_position = glm::vec3(0.0f, 0.0f, 0.0f);
+	rpInstance.m_scale = glm::vec3(10.0f, 1.0f, 10.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = grassTexture;
+	rpInstance.m_specularTexture = grassSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Floor2 adjacent to Floor1";
+	rpInstance.m_position = glm::vec3(10.0f, 0.0f, 0.0f);
+	rpInstance.m_scale = glm::vec3(10.0f, 1.0f, 10.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = grassTexture;
+	rpInstance.m_specularTexture = grassSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Floor3 adjacent to Floor2";
+	rpInstance.m_position = glm::vec3(10.0f, 0.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(10.0f, 1.0f, 10.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = grassTexture;
+	rpInstance.m_specularTexture = grassSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Floor4 dirt floor in big room";
+	rpInstance.m_position = glm::vec3(10.0f, 0.0f, 22.5f);
+	rpInstance.m_scale = glm::vec3(15.0f, 1.0f, 15.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = dirtTexture;
+	rpInstance.m_specularTexture = dirtSpecularMap; 
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "Floor5 (alley)";
+	rpInstance.m_position = glm::vec3(18.0f, 0.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(6.0f, 1.0f, 5.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = grassTexture;
+	rpInstance.m_specularTexture = grassSpecularMap; 
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "ceiling above floor5 (alley)";
+	rpInstance.m_position = glm::vec3(18.0f, 6.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(6.0f, 1.0f, 7.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = rustTexture;
+	rpInstance.m_specularTexture = rustSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "floor6 (cave)";
+	rpInstance.m_position = glm::vec3(31.0f, 0.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(20.0f, 1.0f, 20.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = dirtTexture;
+	rpInstance.m_specularTexture = dirtSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "ceiling6 (cave)";
+	rpInstance.m_position = glm::vec3(31.0f, 6.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(20.0f, 1.0f, 20.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = rustTexture;
+	rpInstance.m_specularTexture = rustSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "left front wall cave (outside of cave facing entrance)";
+	rpInstance.m_position = glm::vec3(21.5f, 3.0f, 3.75f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 7.5f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "right front wall cave (outside of cave facing entrance)";
+	rpInstance.m_position = glm::vec3(21.5f, 3.0f, 16.25f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 7.5f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "back wall cave (outside of cave facing entrance)";
+	rpInstance.m_position = glm::vec3(40.5f, 3.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 20.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "left wall cave (outside of cave facing entrance)";
+	rpInstance.m_position = glm::vec3(31.0f, 3.0f, 0.5f);
+	rpInstance.m_scale = glm::vec3(18.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "right wall cave (outside of cave facing entrance)";
+	rpInstance.m_position = glm::vec3(31.0f, 3.0f, 19.5f);
+	rpInstance.m_scale = glm::vec3(18.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "big house ceiling";
+	rpInstance.m_position = glm::vec3(10.0f, 9.0f, 22.5f);
+	rpInstance.m_scale = glm::vec3(15.0f, 1.0f, 15.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = rustTexture;
+	rpInstance.m_specularTexture = rustSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "short right wall room 1";
+	rpInstance.m_position = glm::vec3(2.5f, 3.0f, 4.5f);
+	rpInstance.m_scale = glm::vec3(15.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "long left wall room 1";
+	rpInstance.m_position = glm::vec3(5.0f, 3.0f, -4.5f);
+	rpInstance.m_scale = glm::vec3(20.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "back wall room 1";
+	rpInstance.m_position = glm::vec3(-4.5f, 3.0f, 0.0);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 8.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "far wall room 2";
+	rpInstance.m_position = glm::vec3(15.5f, 3.0f, 1.25f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 12.5f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "right wall room 3";
+	rpInstance.m_position = glm::vec3(5.5f, 3.0f, 10.0f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 10.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "left wall room 3";
+	rpInstance.m_position = glm::vec3(15.5f, 3.0f, 13.75f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 2.5f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "door partition 1";
+	rpInstance.m_position = glm::vec3(4.5f, 3.0f, 3.25f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 1.5f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "door partition 2";
+	rpInstance.m_position = glm::vec3(4.5f, 3.0f, -3.25f);
+	rpInstance.m_scale = glm::vec3(1.0f, 5.0f, 1.5f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "big house left door partition";
+	rpInstance.m_position = glm::vec3(15.0f, 3.0f, 15.5f);
+	rpInstance.m_scale = glm::vec3(5.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "big house right door partition";
+	rpInstance.m_position = glm::vec3(5.0f, 3.0f, 15.5f);
+	rpInstance.m_scale = glm::vec3(5.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "big house door header";
+	rpInstance.m_position = glm::vec3(10.0f, 7.0f, 15.5f);
+	rpInstance.m_scale = glm::vec3(15.0f, 3.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "big house back wall";
+	rpInstance.m_position = glm::vec3(10.0f, 4.5f, 29.5f);
+	rpInstance.m_scale = glm::vec3(15.0f, 8.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "big house left wall";
+	rpInstance.m_position = glm::vec3(17.0f, 4.5f, 22.5f);
+	rpInstance.m_scale = glm::vec3(1.0f, 8.0f, 13.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "big house right wall";
+	rpInstance.m_position = glm::vec3(3.0f, 4.5f, 22.5f);
+	rpInstance.m_scale = glm::vec3(1.0f, 8.0f, 13.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "floating box at spawn";
+	rpInstance.m_position = glm::vec3(0.0f, 3.0f, 0.0f);
+	rpInstance.m_scale = glm::vec3(1.0f, 1.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = boxTexture;
+	rpInstance.m_specularTexture = boxSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "floating box in the big house";
+	rpInstance.m_position = glm::vec3(10.0f, 3.0f, 22.5f);
+	rpInstance.m_scale = glm::vec3(2.0f, 2.0f, 2.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = boxTexture;
+	rpInstance.m_specularTexture = boxSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "left wall alley";
+	rpInstance.m_position = glm::vec3(18.5f, 3.0f, 7.0f);
+	rpInstance.m_scale = glm::vec3(5.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
+
+	rpInstance.m_description = "right wall alley";
+	rpInstance.m_position = glm::vec3(18.5f, 3.0f, 13.0f);
+	rpInstance.m_scale = glm::vec3(5.0f, 5.0f, 1.0f);
+	rpInstance.m_rotationAxis = glm::vec3(0.0f, 1.0f, 0.0f);
+	rpInstance.m_rotationAngleRadians = glm::radians(0.0f);
+	rpInstance.m_diffuseTexture = brickTexture;
+	rpInstance.m_specularTexture = brickSpecularMap;
+	rp = RectangularPrismBuilder::build(rpInstance);
+	WorldLoader::m_prisms2.push_back(rp);
 }
 
 

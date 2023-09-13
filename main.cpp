@@ -266,10 +266,14 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 */
 //#define STBI_NO_SIMD
 #define STB_IMAGE_IMPLEMENTATION
+#define GLFW_INCLUDE_VULKAN
 
 #include <iostream>
+
+// Graphics Libraries
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <vulkan/vulkan.h>
 //#include <SDL.h>
 
 // Developed libraries
@@ -278,40 +282,32 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 #include "GlfwGame.hpp"
 #include "GlfwWindow1.hpp"
 
+#include "VulkanGlfwGameRunner.hpp"
+
+
+enum Renderer {
+	OPENGL_GLFW,
+	OPENGL_SDL,
+	VULKAN_GLFW,
+	VULKAN_SDL
+};
+
 int main(int argc, char* argv[]) {
 	/*SdlWindow sdlWindow;
 	sdlWindow.create();*/
 
-	//GlfwWindow glfwWindow;
-	//glfwWindow.createWindow();
+	Renderer renderer = VULKAN_GLFW;
 
-	GlfwGame glfwGame;
-	glfwGame.init(); 
-	glfwGame.runGame();
+	if (renderer == OPENGL_GLFW) {
+		GlfwGame glfwGame;
+		glfwGame.init();
+		glfwGame.runGame();
+	} else if (renderer == VULKAN_GLFW) {
+		VulkanGlfwGameRunner game;
+		game.run();
+	}
 
-
-	//GlfwWindow1 glfw;
-	//glfw.create();
 
 	
 	return 0;
 }
-
-/*
-= Objectives Learned
-	- how to create and manipulate windows
-	- how to draw meshes/models
-	- how to use shaders
-	- how to use uniform variables
-	- how to use GLM to transform models
-	- how to use indexed draws
-	- how to use projections
-	- how to create and control a camera
-	- how to map textures 
-	- how to use the phong lighting model
-	- how to implement directional, point, and spot lights
-	- how to import models
-	- how to create and use shadow maps
-	- how to implement a skybox
-
-*/

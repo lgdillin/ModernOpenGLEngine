@@ -11,12 +11,17 @@
 
 #include "RectPrism.hpp"
 
+#include "RpInstance.hpp"
+
 class RectangularPrismBuilder {
 public:
 
 	static void initialize();
 
-	static RectPrism build();
+	static RectPrism build(RpInstance _rpInstance);
+
+	static void initializeSourceBoundingBox();
+	static void computeInterpolatedNormalsSmoothEdges();
 
 	static const unsigned int m_vertexDataSize =
 		4 // number of vertices per face

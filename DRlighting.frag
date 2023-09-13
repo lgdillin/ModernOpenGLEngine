@@ -15,9 +15,12 @@ struct Light {
 	float quadratic;
 };
 
-const int NUMBER_LIGHTS = 1;
+const int NUMBER_LIGHTS = 3;
 uniform Light u_lights[NUMBER_LIGHTS];
 uniform vec3 u_viewPos;
+
+// directional light info
+uniform vec3 u_dirLightPos;
 
 void main() {
 
@@ -27,18 +30,31 @@ void main() {
 	vec3 gDiffuse = texture(u_gAlbedoSpecular, v_out_texCoords).rgb;
 	float gSpecular = texture(u_gAlbedoSpecular, v_out_texCoords).a;
 
-	//gDiffuse = (gDiffuse * 0.5) + 0.5;
-
 	// then calculate lighting as usual 
 	vec3 lighting = gDiffuse * 0.1; // hard-coded ambient component.
 	vec3 viewDir = normalize(u_viewPos - gFragPosition);
 
+	// directional light 
+	float dirDiffuseFactor = 0.3;
+	vec3 n_dirLightPos = normalize(u_dirLightPos);
+	float dir_diffuseAngle = max(dot(gNormal, n_dirLightPos), 0.0);
+	vec3 dir_diffuse = dirDiffuseFactor * dir_diffuseAngle * gDiffuse;
+
+	//vec3 dir_lightDir = normalize(u_dirLightPos - gFragPosition);
+	//vec3 dir_midDir = normalize(dir_lightDir + viewDir);
+	vec3 dir_reflectDir = -reflect(n_dirLightPos, gNormal);
+	float dir_specMultiplier = pow(max(dot(viewDir, dir_reflectDir), 0.0), 64.0);
+	vec3 dir_specular = dir_specMultiplier * gSpecular * vec3(1.0, 1.0, 1.0);
+	//dir_specular *= 0.00001;
+	vec3 dir_lighting = dir_diffuse + dir_specular;
+
+	// point lights
 	for(int i = 0; i < NUMBER_LIGHTS; ++i) {
 
 		// diffuse 
 		vec3 lightDir = normalize(u_lights[i].position - gFragPosition);
-		vec3 diffuse = max(dot(gNormal, lightDir), 0.0) 
-			* gDiffuse * u_lights[i].color;
+		// max(dot(gNormal, lightDir), 0.0) // lambert's cosine law 
+		vec3 diffuse = max(dot(gNormal, lightDir), 0.0) * gDiffuse * u_lights[i].color;
 
 		// Specular 
 		vec3 halfwayDir = normalize(lightDir + viewDir);
@@ -57,6 +73,8 @@ void main() {
 		specular *= attenuation;
 		lighting += diffuse + specular;
 	}
+
+	lighting += dir_lighting;
 
 	//f_out_fragColor = texture(u_gAlbedoSpecular, v_out_texCoords) * vec4(lighting, 0.0);
 	f_out_fragColor = vec4(lighting, 1.0);

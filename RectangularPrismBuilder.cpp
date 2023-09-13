@@ -1,16 +1,19 @@
 #include "RectangularPrismBuilder.hpp"
 
-static std::array <GLfloat, RectangularPrismBuilder::m_boundingBoxSize> 
-	m_boundingBoxSource = std::array<GLfloat, RectangularPrismBuilder::m_boundingBoxSize>();
-static std::array <GLfloat, RectangularPrismBuilder::m_boundingBoxSize> 
-	m_boundingBoxTransformed = std::array<GLfloat, RectangularPrismBuilder::m_boundingBoxSize>();
+std::array <GLfloat, RectangularPrismBuilder::m_boundingBoxSize> 
+	RectangularPrismBuilder::m_boundingBoxSource 
+	= std::array<GLfloat, RectangularPrismBuilder::m_boundingBoxSize>();
+
+std::array <GLfloat, RectangularPrismBuilder::m_boundingBoxSize> 
+	RectangularPrismBuilder::m_boundingBoxTransformed 
+	= std::array<GLfloat, RectangularPrismBuilder::m_boundingBoxSize>();
 
 void RectangularPrismBuilder::initialize() {
 	computeInterpolatedNormalsSmoothEdges();
-	initializeSourceBoundingBox(RectangularPrismBuilder::m_boundingBoxSource);
+	initializeSourceBoundingBox();
 }
 
-RectPrism RectangularPrismBuilder::build() {
+RectPrism RectangularPrismBuilder::build(RpInstance _rpInstance) {
 	RectPrism rp = RectPrism();
 
 	Mesh *mesh = new Mesh();
@@ -21,10 +24,24 @@ RectPrism RectangularPrismBuilder::build() {
 		RectangularPrismBuilder::m_indicesDataSize);
 	rp.setMesh(mesh);
 
-	
+	// init data
+	rp.setDescription(_rpInstance.m_description);
+	rp.setDiffuseTexture(_rpInstance.m_diffuseTexture);
+	rp.setSpecularTexture(_rpInstance.m_specularTexture);
+
+	// set up geometrical data
+	rp.setPosition(_rpInstance.m_position);
+	rp.setRotationalAxis(_rpInstance.m_rotationAxis);
+	rp.setScale(_rpInstance.m_scale);
+	rp.setColor(_rpInstance.m_color);
+	rp.setRotationalAngle(_rpInstance.m_rotationAngleRadians);
+
+	rp.setBoundingBoxPointer(m_boundingBoxSource);
+
+	return rp;
 }
 
-void initializeSourceBoundingBox(std::array<GLfloat, RectangularPrismBuilder::m_boundingBoxSize> _array) {
+void RectangularPrismBuilder::initializeSourceBoundingBox() {
 	GLfloat xMin = RectangularPrismBuilder::m_vertices[0];
 	GLfloat xMax = RectangularPrismBuilder::m_vertices[0];
 
@@ -61,47 +78,47 @@ void initializeSourceBoundingBox(std::array<GLfloat, RectangularPrismBuilder::m_
 
 	// vertices are defined front to back, CCW starting bottom left
 	// vertex 0:
-	_array[0] = xMin;
-	_array[1] = yMin;
-	_array[2] = zMax;
+	RectangularPrismBuilder::m_boundingBoxSource[0] = xMin;
+	RectangularPrismBuilder::m_boundingBoxSource[1] = yMin;
+	RectangularPrismBuilder::m_boundingBoxSource[2] = zMax;
 
 	// vertex 1;:
-	_array[3] = xMax;
-	_array[4] = yMin;
-	_array[5] = zMax;
+	RectangularPrismBuilder::m_boundingBoxSource[3] = xMax;
+	RectangularPrismBuilder::m_boundingBoxSource[4] = yMin;
+	RectangularPrismBuilder::m_boundingBoxSource[5] = zMax;
 
 	//vertex 2
-	_array[6] = xMax;
-	_array[7] = yMax;
-	_array[8] = zMax;
+	RectangularPrismBuilder::m_boundingBoxSource[6] = xMax;
+	RectangularPrismBuilder::m_boundingBoxSource[7] = yMax;
+	RectangularPrismBuilder::m_boundingBoxSource[8] = zMax;
 
 	// vertex 3
-	_array[9] = xMin;
-	_array[10] = yMax;
-	_array[11] = zMax;
+	RectangularPrismBuilder::m_boundingBoxSource[9] = xMin;
+	RectangularPrismBuilder::m_boundingBoxSource[10] = yMax;
+	RectangularPrismBuilder::m_boundingBoxSource[11] = zMax;
 
 	// vertex 4
-	_array[12] = xMin;
-	_array[13] = yMin;
-	_array[14] = zMin;
+	RectangularPrismBuilder::m_boundingBoxSource[12] = xMin;
+	RectangularPrismBuilder::m_boundingBoxSource[13] = yMin;
+	RectangularPrismBuilder::m_boundingBoxSource[14] = zMin;
 
 	// vertex 5
-	_array[15] = xMax;
-	_array[16] = yMin;
-	_array[17] = zMin;
+	RectangularPrismBuilder::m_boundingBoxSource[15] = xMax;
+	RectangularPrismBuilder::m_boundingBoxSource[16] = yMin;
+	RectangularPrismBuilder::m_boundingBoxSource[17] = zMin;
 
 	// vertex 6
-	_array[18] = xMax;
-	_array[19] = yMax;
-	_array[20] = zMin;
+	RectangularPrismBuilder::m_boundingBoxSource[18] = xMax;
+	RectangularPrismBuilder::m_boundingBoxSource[19] = yMax;
+	RectangularPrismBuilder::m_boundingBoxSource[20] = zMin;
 
 	// vertex 7
-	_array[21] = xMin;
-	_array[22] = yMax;
-	_array[23] = zMin;
+	RectangularPrismBuilder::m_boundingBoxSource[21] = xMin;
+	RectangularPrismBuilder::m_boundingBoxSource[22] = yMax;
+	RectangularPrismBuilder::m_boundingBoxSource[23] = zMin;
 }
 
-void computeInterpolatedNormalsSmoothEdges() {
+void RectangularPrismBuilder::computeInterpolatedNormalsSmoothEdges() {
 	unsigned int index0, index1, index2;
 	for (size_t i = 0; i < RectangularPrismBuilder::m_numberOfVertexComponents / 3; ++i) {
 

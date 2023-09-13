@@ -10,6 +10,9 @@
 #include "Shader.hpp"
 #include "Material.hpp"
 #include "MeshGroup.hpp"
+#include "RpInstance.hpp"
+#include "RectangularPrismBuilder.hpp"
+#include "RectPrism.hpp"
 
 class WorldLoader {
 public:
@@ -18,6 +21,7 @@ public:
 	static std::vector<Material> m_materials;
 	static std::vector<Shader *> m_shaders;
 	static std::vector<RectangularPrism> m_prisms;
+	static std::vector<RectPrism> m_prisms2;
 	static std::vector<MeshGroup> m_meshGroups;
 	
 	static Skybox m_skybox;
@@ -43,6 +47,8 @@ public:
 	static void loadShaders();
 
 	static void loadMeshGroups();
+
+	static void loadBrushes2();
 
 	static void addNewBrushS(
 		std::string color,

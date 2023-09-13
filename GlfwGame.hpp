@@ -24,7 +24,6 @@
 #include "DirectionalLight.hpp"
 #include "PointLight.hpp"
 #include "Material.hpp"
-#include "CameraBall.hpp"
 #include "SpotLight.hpp"
 #include "MeshGroup.hpp"
 #include "Skybox.hpp"
@@ -43,8 +42,9 @@ private:
 	std::vector<Material> materials;
 	std::vector<Shader*> shaders;
 	std::vector<RectangularPrism> prisms;
+	std::vector<RectPrism> prisms2;
 
-	std::vector<RectangularPrism> prisms2;
+	//std::vector<RectangularPrism> prisms2;
 	std::vector <std::string> skyboxFaces;
 
 	SpotLight *spotLights;
@@ -73,7 +73,6 @@ private:
 
 	GlfwWindow *glfwWindow;
 	GlfwCamera glfwCamera;
-	CameraBall cameraBall;
 
 	Texture *dirtTexture, *brickTexture, *grassTexture, *boxTexture,
 		*rustTexture, *plainTexture;
@@ -137,6 +136,7 @@ public:
 
 		WorldLoader::load();
 		prisms = WorldLoader::m_prisms;
+		prisms2 = WorldLoader::m_prisms2;
 		directionalLight = &WorldLoader::m_directionalLight;
 		spotLights = WorldLoader::m_spotLights;
 		pointLights = WorldLoader::m_pointLights;
@@ -153,8 +153,8 @@ public:
 		superShinyMaterial = WorldLoader::m_materials[2];
 
 		cat = WorldLoader::m_meshGroups[0];
-		prismPtr = &prisms[5];
-		prismPtr2 = &prisms[33];
+		//prismPtr = &prisms[5];
+		//prismPtr2 = &prisms[33];
 
 		gBuffer = GBuffer();
 		gBuffer.init2(glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight());
@@ -162,14 +162,14 @@ public:
 		screenQuad = Quad();
 		screenQuad.initialize(glfwWindow->getWindowWidth(), glfwWindow->getWindowHeight());
 
-		rp.initialize();
-		rp.pickColor("white");
-		rp.setTexture(prismPtr->getTexture());
-		rp.setTranslationVector(glm::vec3(1.5f, 3.0f, 0.0f));
-		rp.setRotationAngle(glm::radians(0.0f));
-		rp.setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
-		rp.setScalingVector(glm::vec3(0.1f, 0.1f, 0.1f));
-		rp.setSpecularMap(prismPtr->getSpecularMap());
+		//rp.initialize();
+		//rp.pickColor("white");
+		//rp.setTexture(prismPtr->getTexture());
+		//rp.setTranslationVector(glm::vec3(1.5f, 3.0f, 0.0f));
+		//rp.setRotationAngle(glm::radians(0.0f));
+		//rp.setRotationVector(glm::vec3(0.0f, 1.0f, 0.0f));
+		//rp.setScalingVector(glm::vec3(0.1f, 0.1f, 0.1f));
+		//rp.setSpecularMap(prismPtr->getSpecularMap());
 	}
 
 	void renderCat() {
@@ -415,10 +415,18 @@ public:
 		dr_shaderGeomPass->setMat4("u_projection", glfwWindow->getProjection());
 		dr_shaderGeomPass->setMat4("u_view", glfwCamera.calculateViewMatrix());
 
-		for (auto &prism : prisms) {
-			prism.transform();
-			dr_shaderGeomPass->setMat4("u_model", prism.getModelMatrix());
+		//for (auto &prism : prisms) {
+		//	prism.transform();
+		//	dr_shaderGeomPass->setMat4("u_model", prism.getModelMatrix());
+		//	prism.draw(*dr_shaderGeomPass);
+		//}
+
+		glm::mat4 model(1);
+		for (auto &prism : prisms2) {
+			prism.transform(model);
+			dr_shaderGeomPass->setMat4("u_model", model);
 			prism.draw(*dr_shaderGeomPass);
+			model = glm::mat4(1); // reset for next
 		}
 
 
@@ -442,10 +450,25 @@ public:
 		glBindTexture(GL_TEXTURE_2D, gBuffer.getGAlbedoSpecular());
 
 		//// add in the lighting loop
+		// directional light
+		dr_shaderLightPass->setVec3("u_dirLightPos", glm::vec3(0.0f, 10.0f, 20.0f));
+
+		// pointlights
 		dr_shaderLightPass->setVec3("u_lights[0].position", glm::vec3(1.5f, 3.0f, 0.0f));
 		dr_shaderLightPass->setVec3("u_lights[0].color", glm::vec3(1.0f, 1.0f, 1.0f));
 		dr_shaderLightPass->setFloat("u_lights[0].linear", 0.1f);
 		dr_shaderLightPass->setFloat("u_lights[0].quadratic", 0.5f);
+
+		dr_shaderLightPass->setVec3("u_lights[1].position", glm::vec3(10.0f, 6.0f, 22.5f));
+		dr_shaderLightPass->setVec3("u_lights[1].color", glm::vec3(1.0f, 0.0f, 0.0f));
+		dr_shaderLightPass->setFloat("u_lights[1].linear", 0.1f);
+		dr_shaderLightPass->setFloat("u_lights[1].quadratic", 0.5f);
+
+		dr_shaderLightPass->setVec3("u_lights[2].position", glm::vec3(28.5f, 2.0f, 10.0f));
+		dr_shaderLightPass->setVec3("u_lights[2].color", glm::vec3(1.0f, 0.5f, 1.0f));
+		dr_shaderLightPass->setFloat("u_lights[2].linear", 0.1f);
+		dr_shaderLightPass->setFloat("u_lights[2].quadratic", 0.1f);
+
 		dr_shaderLightPass->setVec3("u_viewPos", glfwCamera.getCameraPosition());
 		screenQuad.render();
 
@@ -465,13 +488,13 @@ public:
 
 		// render some simple cubes on top of the scene
 		glEnable(GL_BLEND);
-		dr_lightBoxPass->useShader();
-		dr_lightBoxPass->setMat4("u_projection", glfwWindow->getProjection());
-		dr_lightBoxPass->setMat4("u_view", glfwCamera.calculateViewMatrix());
-		dr_lightBoxPass->setVec3("u_lightColor", glm::vec3(1.0f, 0.0f, 0.0f));
-		rp.transform();
-		dr_lightBoxPass->setMat4("u_model", rp.getModelMatrix());
-		rp.draw(*dr_lightBoxPass);
+		//dr_lightBoxPass->useShader();
+		//dr_lightBoxPass->setMat4("u_projection", glfwWindow->getProjection());
+		//dr_lightBoxPass->setMat4("u_view", glfwCamera.calculateViewMatrix());
+		//dr_lightBoxPass->setVec3("u_lightColor", glm::vec3(1.0f, 0.0f, 0.0f));
+		//rp.transform();
+		//dr_lightBoxPass->setMat4("u_model", rp.getModelMatrix());
+		//rp.draw(*dr_lightBoxPass);
 	}
 
 	void runGame() {
