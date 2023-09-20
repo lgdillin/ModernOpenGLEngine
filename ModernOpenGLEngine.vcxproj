@@ -157,7 +157,7 @@
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UtilityDebug.cpp" />
-    <ClCompile Include="VulkanRendererGlfw.cpp" />
+    <ClCompile Include="VulkanGlfwEngine.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicRenderPipeline.md" />
@@ -193,9 +193,11 @@
     <ClInclude Include="Sprite.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="Utilities.hpp" />
-    <ClInclude Include="VulkanGlfwGameRunner.hpp" />
-    <ClInclude Include="VulkanRendererGlfw.hpp" />
-    <ClInclude Include="VulkanValidation.hpp" />
+    <ClInclude Include="VulkanGlfwDeviceBuilder.hpp" />
+    <ClInclude Include="VulkanGlfwEngine.hpp" />
+    <ClInclude Include="VulkanGlfwInstanceBuilder.hpp" />
+    <ClInclude Include="VulkanHeaderLoadOrder.hpp" />
+    <ClInclude Include="VulkanLogging.hpp" />
     <ClInclude Include="WorldLoader.cpp" />
     <ClInclude Include="WorldLoader.hpp" />
   </ItemGroup>

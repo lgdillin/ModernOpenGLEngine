@@ -1,12 +1,10 @@
 #pragma once
 
+#include "VulkanHeaderLoadOrder.hpp"
+
 #include <iostream>
 #include <cmath>
 #include <vector>
-
-#define GLFW_INCLUDE_VULKAN
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -147,8 +145,8 @@ public:
 			windowWidth,
 			windowHeight,
 			"Vulkan Window",
-			nullptr,
-			nullptr
+			nullptr, // use this if you want to make it fullscreen
+			nullptr // an extra window to share resources with
 		);
 
 		uint32_t count = 0;

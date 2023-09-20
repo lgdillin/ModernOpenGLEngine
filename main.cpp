@@ -266,14 +266,9 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 */
 //#define STBI_NO_SIMD
 #define STB_IMAGE_IMPLEMENTATION
-#define GLFW_INCLUDE_VULKAN
-
-#include <iostream>
 
 // Graphics Libraries
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
-#include <vulkan/vulkan.h>
+#include "VulkanHeaderLoadOrder.hpp"
 //#include <SDL.h>
 
 // Developed libraries
@@ -282,7 +277,7 @@ VECTORS, MATRICES, AND UNIFORM VARIABLES
 #include "GlfwGame.hpp"
 #include "GlfwWindow1.hpp"
 
-#include "VulkanGlfwGameRunner.hpp"
+#include "VulkanGlfwEngine.hpp"
 
 
 enum Renderer {
@@ -303,11 +298,10 @@ int main(int argc, char* argv[]) {
 		glfwGame.init();
 		glfwGame.runGame();
 	} else if (renderer == VULKAN_GLFW) {
-		VulkanGlfwGameRunner game;
-		game.run();
+		VulkanGlfwEngine engine = VulkanGlfwEngine();
 	}
 
-
+	
 	
 	return 0;
 }
