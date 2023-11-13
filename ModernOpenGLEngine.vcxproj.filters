@@ -19,184 +19,106 @@
     <Filter Include="Source Files\Vulkan">
       <UniqueIdentifier>{995f42cf-3359-40be-a167-684d820bcc21}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\VulkanShaders">
+      <UniqueIdentifier>{45200bf9-6f5c-46c4-b2b6-279d28cea5bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\OpenGL">
+      <UniqueIdentifier>{b7ce69db-3586-40cf-9688-13041174bc0f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\OpenGL">
+      <UniqueIdentifier>{4f7685c5-036a-4e52-b331-c54fbea9b74b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OpenGL">
+      <UniqueIdentifier>{5c6d3351-9a59-44cb-a1b6-4f5fff6a2b13}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\notes">
+      <UniqueIdentifier>{5b79a9b1-5e4f-4fbb-84f6-edd57ca1e66a}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GlfwCamera.hpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Texture.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RectangularPrism.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Light.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Material.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="DirectionalLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="PointLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="SpotLight.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="MeshGroup.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ShadowMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="UtilityDebug.cpp">
-      <Filter>Resource Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OmniShadowMap.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Sprite.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="stb_image.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Skybox.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="GBuffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Quad.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RectangularPrismBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="RectPrism.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="VulkanGlfwEngine.cpp">
       <Filter>Source Files\Vulkan</Filter>
     </ClCompile>
+    <ClCompile Include="UtilityDebug.cpp">
+      <Filter>Resource Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="GlfwCamera.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="DirectionalLight.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="GBuffer.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Light.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Material.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Mesh.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="MeshGroup.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="OmniShadowMap.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="PointLight.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Quad.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangularPrism.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="RectangularPrismBuilder.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="RectPrism.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Shader.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="ShadowMap.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="SpotLight.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Sprite.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="stb_image.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="Texture.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanGameRunner.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanApp.cpp">
+      <Filter>Source Files\Vulkan</Filter>
+    </ClCompile>
+    <ClCompile Include="VulkanScene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TriangleMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="SdlWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mesh.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="BasicRenderPipeline.md">
-      <Filter>Resource Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GlfwWindow.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GlfwGame.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Texture.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Light.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RectangularPrism.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Material.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="DirectionalLight.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PointLight.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="CameraBall.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshCollider.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Simplex.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ManifoldPoints.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="PhysicsModel.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Object.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Entity.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Player.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Camera.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="SpotLight.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="MeshGroup.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ShadowMap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="OmniShadowMap.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Sprite.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Skybox.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldLoader.cpp">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="WorldLoader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="GBuffer.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Quad.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RectangularPrismBuilder.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RectPrism.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="RpInstance.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Utilities.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="VulkanGlfwEngine.hpp">
       <Filter>Header Files\Vulkan</Filter>
     </ClInclude>
@@ -212,97 +134,271 @@
     <ClInclude Include="VulkanLogging.hpp">
       <Filter>Header Files\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="VulkanUtilities.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanSwapchain.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanShader.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Camera.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="CameraBall.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="DirectionalLight.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Entity.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="GBuffer.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="GlfwGame.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="GlfwWindow.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Light.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="ManifoldPoints.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Material.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Mesh.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshCollider.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="MeshGroup.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Object.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="OmniShadowMap.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="PhysicsModel.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Player.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="PointLight.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Quad.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="RectangularPrism.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="RectangularPrismBuilder.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="RectPrism.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="RpInstance.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="SdlWindow.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Shader.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="ShadowMap.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Simplex.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Skybox.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="SpotLight.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Sprite.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Texture.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="Utilities.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldLoader.hpp">
+      <Filter>Header Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="WorldLoader.cpp">
+      <Filter>Source Files\OpenGL</Filter>
+    </ClInclude>
+    <ClInclude Include="BasicRenderPipeline.md">
+      <Filter>Resource Files\notes</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanCommands.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanFramebuffer.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanPipeline.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanSync.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanApp.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanFrame.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanGameRunner.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanMemory.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanMesh.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanRenderStructs.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="VulkanScene.hpp">
+      <Filter>Header Files\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="TriangleMesh.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <None Include="VectorsMatricesUniformVariables.md">
-      <Filter>Resource Files</Filter>
+    <None Include="VulkanShader1.vert">
+      <Filter>Resource Files\VulkanShaders</Filter>
     </None>
-    <None Include="InterpolationIndexedDrawsProjections.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="vertexShader.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fragmentShader.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="CameraAndUserInput.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="TexturesAndImageLoading.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="PhongLightingAndDirectionalLights.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fragmentShaderColor.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="MovingCamera.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="PointLightAndSpotLights.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="ScalingAndClippingTextures.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="vDirectionalShadowMap.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="fDirectionalShadowMap.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="ShadowMapping.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="shadowPass.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="shadowPass.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="OmnidirectionalShadowsCubeMapsGeomShader.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="omniShadowMap.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="omniShadowMap.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="omniShadowMap.geom">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="Skybox.md">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="skyboxShader.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="skyboxShader.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="DRgeom.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="DRgeom.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="DRlighting.frag">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="DRlighting.vert">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="DRlighting1.frag">
-      <Filter>Resource Files</Filter>
+    <None Include="VulkanShader1.frag">
+      <Filter>Resource Files\VulkanShaders</Filter>
     </None>
     <None Include="basicShader.frag">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\OpenGL</Filter>
     </None>
     <None Include="basicShader.vert">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\OpenGL</Filter>
     </None>
+    <None Include="DRgeom.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="DRgeom.vert">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="DRlighting.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="DRlighting.vert">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="DRlighting1.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="fDirectionalShadowMap.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="fragmentShader.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="fragmentShaderColor.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="MovingCamera.md">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="omniShadowMap.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="omniShadowMap.geom">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="omniShadowMap.vert">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="ShadowMapping.md">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="shadowPass.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="shadowPass.vert">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="Skybox.md">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="skyboxShader.frag">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="skyboxShader.vert">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="vDirectionalShadowMap.vert">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="vertexShader.vert">
+      <Filter>Resource Files\OpenGL</Filter>
+    </None>
+    <None Include="CameraAndUserInput.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="InterpolationIndexedDrawsProjections.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="OmnidirectionalShadowsCubeMapsGeomShader.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="PhongLightingAndDirectionalLights.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="PointLightAndSpotLights.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="ScalingAndClippingTextures.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="TexturesAndImageLoading.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="VectorsMatricesUniformVariables.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="VulkanGraphicsPipeline.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="VulkanRenderingProcess.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="OpenGL_frameworks.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="MultiThreadedRendering.md">
+      <Filter>Resource Files\notes</Filter>
+    </None>
+    <None Include="VulkanVertexBuffers.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SPIRV_compile.bat">
+      <Filter>Resource Files</Filter>
+    </Text>
   </ItemGroup>
 </Project>

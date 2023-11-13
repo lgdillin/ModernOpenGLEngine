@@ -4,7 +4,28 @@
 
 namespace vkLogging {
 
-
+	static void logDeviceProperties(vk::PhysicalDevice _device) {
+		vk::PhysicalDeviceProperties props = _device.getProperties();
+		
+		std::cout << "Device details:\n";
+		std::string type;
+		switch (props.deviceType) {
+		case(vk::PhysicalDeviceType::eCpu):
+			type = "CPU"; break;
+		case(vk::PhysicalDeviceType::eDiscreteGpu):
+			type = "Discrete GPU"; break;
+		case(vk::PhysicalDeviceType::eIntegratedGpu):
+			type = "Integrated GPU"; break;
+		case(vk::PhysicalDeviceType::eVirtualGpu):
+			type = "Virtual GPU"; break;
+		default:
+			type = "Other"; break;
+		}
+		std::cout << "\tDevice Type: " << type << "\n"
+			<< "\t" << _device.getProperties().deviceName << "\n"
+			<< "\t" << _device.getProperties().deviceID << "\n"
+			<< "\t" << _device.getProperties().driverVersion << "\n";
+	}
 
 	static std::vector<std::string> logTransformBits(
 		vk::SurfaceTransformFlagsKHR _bits

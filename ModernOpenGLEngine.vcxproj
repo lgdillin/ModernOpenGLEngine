@@ -156,8 +156,12 @@
     <ClCompile Include="Sprite.cpp" />
     <ClCompile Include="stb_image.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="TriangleMesh.cpp" />
     <ClCompile Include="UtilityDebug.cpp" />
+    <ClCompile Include="VulkanApp.cpp" />
+    <ClCompile Include="VulkanGameRunner.cpp" />
     <ClCompile Include="VulkanGlfwEngine.cpp" />
+    <ClCompile Include="VulkanScene.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BasicRenderPipeline.md" />
@@ -183,6 +187,10 @@
     <ClInclude Include="RectangularPrism.hpp" />
     <ClInclude Include="RectangularPrismBuilder.hpp" />
     <ClInclude Include="RectPrism.hpp" />
+    <ClInclude Include="TriangleMesh.hpp" />
+    <ClInclude Include="VulkanMemory.hpp" />
+    <ClInclude Include="VulkanMesh.hpp" />
+    <ClInclude Include="VulkanRenderStructs.hpp" />
     <ClInclude Include="RpInstance.hpp" />
     <ClInclude Include="SdlWindow.hpp" />
     <ClInclude Include="Shader.hpp" />
@@ -193,11 +201,22 @@
     <ClInclude Include="Sprite.hpp" />
     <ClInclude Include="Texture.hpp" />
     <ClInclude Include="Utilities.hpp" />
+    <ClInclude Include="VulkanApp.hpp" />
+    <ClInclude Include="VulkanCommands.hpp" />
+    <ClInclude Include="VulkanFrame.hpp" />
+    <ClInclude Include="VulkanFramebuffer.hpp" />
+    <ClInclude Include="VulkanGameRunner.hpp" />
     <ClInclude Include="VulkanGlfwDeviceBuilder.hpp" />
     <ClInclude Include="VulkanGlfwEngine.hpp" />
     <ClInclude Include="VulkanGlfwInstanceBuilder.hpp" />
     <ClInclude Include="VulkanHeaderLoadOrder.hpp" />
     <ClInclude Include="VulkanLogging.hpp" />
+    <ClInclude Include="VulkanPipeline.hpp" />
+    <ClInclude Include="VulkanScene.hpp" />
+    <ClInclude Include="VulkanShader.hpp" />
+    <ClInclude Include="VulkanSwapchain.hpp" />
+    <ClInclude Include="VulkanSync.hpp" />
+    <ClInclude Include="VulkanUtilities.hpp" />
     <ClInclude Include="WorldLoader.cpp" />
     <ClInclude Include="WorldLoader.hpp" />
   </ItemGroup>
@@ -210,10 +229,12 @@
     <None Include="DRlighting.frag" />
     <None Include="DRlighting.vert" />
     <None Include="DRlighting1.frag" />
+    <None Include="MultiThreadedRendering.md" />
     <None Include="OmnidirectionalShadowsCubeMapsGeomShader.md" />
     <None Include="omniShadowMap.frag" />
     <None Include="omniShadowMap.geom" />
     <None Include="omniShadowMap.vert" />
+    <None Include="OpenGL_frameworks.md" />
     <None Include="shadowPass.frag" />
     <None Include="shadowPass.vert" />
     <None Include="Skybox.md" />
@@ -232,6 +253,14 @@
     <None Include="TexturesAndImageLoading.md" />
     <None Include="vertexShader.vert" />
     <None Include="VectorsMatricesUniformVariables.md" />
+    <None Include="VulkanGraphicsPipeline.md" />
+    <None Include="VulkanRenderingProcess.md" />
+    <None Include="VulkanShader1.frag" />
+    <None Include="VulkanShader1.vert" />
+    <None Include="VulkanVertexBuffers.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="SPIRV_compile.bat" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
